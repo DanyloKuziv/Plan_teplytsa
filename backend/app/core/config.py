@@ -14,14 +14,17 @@ class Settings(BaseSettings):
 
     CORS_ORIGINS: str = "http://localhost:3000"
 
-    # Mail
+    # Mail (Resend API — preferred)
+    RESEND_API_KEY: str = ""
+    MAIL_FROM: str = "onboarding@resend.dev"
+    MAIL_FROM_NAME: str = "ТеплицяПлан"
+    MAIL_ENABLED: bool = False
+
+    # Mail (SMTP fallback)
     MAIL_USERNAME: str = ""
     MAIL_PASSWORD: str = ""
-    MAIL_FROM: str = ""
-    MAIL_FROM_NAME: str = "ТеплицяПлан"
     MAIL_SERVER: str = "smtp.gmail.com"
     MAIL_PORT: int = 587
-    MAIL_ENABLED: bool = False
 
     class Config:
         env_file = ".env"
