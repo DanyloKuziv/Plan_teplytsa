@@ -1,0 +1,15 @@
+import client from './client.js'
+
+export const getStats       = ()           => client.get('/admin/stats').then(r => r.data)
+export const getUsers       = ()           => client.get('/admin/users').then(r => r.data)
+export const toggleAdmin    = (id)         => client.patch(`/admin/users/${id}/toggle-admin`).then(r => r.data)
+export const getGreenhouses = ()           => client.get('/admin/greenhouses').then(r => r.data)
+export const getAlerts      = ()           => client.get('/admin/alerts').then(r => r.data)
+export const getPlants      = ()           => client.get('/admin/plants').then(r => r.data)
+export const createPlant    = (payload)    => client.post('/admin/plants', payload).then(r => r.data)
+export const updatePlant    = (id, data)   => client.patch(`/admin/plants/${id}`, data).then(r => r.data)
+export const deletePlant    = (id)         => client.delete(`/admin/plants/${id}`)
+export const getNews        = ()           => client.get('/admin/news').then(r => r.data)
+export const createNews     = (payload)    => client.post('/admin/news', payload).then(r => r.data)
+export const updateNews     = (id, data)   => client.patch(`/admin/news/${id}`, data).then(r => r.data)
+export const deleteNews     = (id)         => client.delete(`/admin/news/${id}`)

@@ -1,0 +1,1463 @@
+<!DOCTYPE html>
+<html lang="uk" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ТеплицяПлан — Розумне управління тепличним бізнесом</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      background: #0a0e1a;
+      color: #f1f5f9;
+      font-family: 'Inter', system-ui, sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ── GRID BACKGROUND ── */
+    .hero-grid-bg {
+      background-color: #0a0e1a;
+      background-image:
+        linear-gradient(rgba(0,212,170,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,170,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      background-position: center center;
+    }
+    .hero-radial {
+      background: radial-gradient(ellipse 90% 60% at 60% 40%, rgba(0,212,170,0.10) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* ── BUTTONS ── */
+    .btn-primary {
+      background: #00d4aa;
+      color: #0a0e1a;
+      font-weight: 800;
+      padding: 0.875rem 2.25rem;
+      border-radius: 0.75rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1rem;
+      transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+      box-shadow: 0 0 28px rgba(0,212,170,0.3);
+      white-space: nowrap;
+    }
+    .btn-primary:hover {
+      background: #00b899;
+      transform: translateY(-2px);
+      box-shadow: 0 0 44px rgba(0,212,170,0.5);
+    }
+    .btn-primary:active { transform: scale(0.97); }
+    .btn-outline {
+      background: transparent;
+      color: #f1f5f9;
+      font-weight: 700;
+      padding: 0.875rem 2.25rem;
+      border-radius: 0.75rem;
+      border: 1.5px solid rgba(241,245,249,0.2);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1rem;
+      transition: border-color 0.15s, color 0.15s, transform 0.15s;
+      white-space: nowrap;
+    }
+    .btn-outline:hover {
+      border-color: #00d4aa;
+      color: #00d4aa;
+      transform: translateY(-2px);
+    }
+
+    /* ── CARDS ── */
+    .glass-card {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 1rem;
+    }
+    .feature-card {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 1rem;
+      padding: 1.75rem;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    }
+    .feature-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 60px rgba(0,212,170,0.12);
+      border-color: rgba(0,212,170,0.35);
+    }
+
+    /* ── FLOATING ANIMATION ── */
+    @keyframes floatA {
+      0%, 100% { transform: translateY(0px) rotate(-1deg); }
+      50%       { transform: translateY(-10px) rotate(1deg); }
+    }
+    @keyframes floatB {
+      0%, 100% { transform: translateY(0px); }
+      50%       { transform: translateY(-14px); }
+    }
+    @keyframes floatC {
+      0%, 100% { transform: translateY(0px) rotate(1deg); }
+      50%       { transform: translateY(-8px) rotate(-1deg); }
+    }
+    .float-a { animation: floatA 5s ease-in-out infinite; }
+    .float-b { animation: floatB 6.5s ease-in-out infinite; }
+    .float-c { animation: floatC 4.5s ease-in-out infinite; }
+
+    /* ── PULSE BADGE ── */
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.6; transform: scale(1.3); }
+    }
+    .pulse-dot { animation: pulseDot 1.6s ease-in-out infinite; }
+
+    /* ── MARQUEE ── */
+    @keyframes marquee {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .marquee-track { animation: marquee 28s linear infinite; white-space: nowrap; display: flex; gap: 3rem; }
+    .marquee-wrap { overflow: hidden; mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent); }
+
+    /* ── GLOW ── */
+    .accent-glow { box-shadow: 0 0 0 1px rgba(0,212,170,0.3), 0 0 40px rgba(0,212,170,0.15); }
+    .text-accent { color: #00d4aa; }
+
+    /* ── PRICING TOGGLE ── */
+    .toggle-pill {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 99px;
+      padding: 4px;
+      display: inline-flex;
+    }
+    .toggle-option {
+      padding: 0.4rem 1.25rem;
+      border-radius: 99px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .toggle-option.active {
+      background: #00d4aa;
+      color: #0a0e1a;
+    }
+
+    /* ── STEP LINE ── */
+    .step-line {
+      height: 2px;
+      flex: 1;
+      background: linear-gradient(to right, #00d4aa, rgba(0,212,170,0.15));
+    }
+
+    /* ── NAVBAR ── */
+    #navbar { transition: background 0.3s, backdrop-filter 0.3s, border-color 0.3s; }
+    #navbar.scrolled {
+      background: rgba(10,14,26,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid #1f2937;
+    }
+
+    /* ── BROWSER MOCKUP ── */
+    .browser-bar {
+      background: #1a2035;
+      border-radius: 12px 12px 0 0;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid #1f2937;
+    }
+    .browser-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .browser-url {
+      flex: 1;
+      background: #0f1628;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 11px;
+      color: #64748b;
+    }
+    .browser-body {
+      background: #0f1628;
+      border-radius: 0 0 12px 12px;
+      overflow: hidden;
+    }
+
+    /* ── MINI CHART ── */
+    .mini-bar {
+      width: 100%;
+      background: #1a2035;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    /* ── PHOTO GALLERY ── */
+    .photo-card {
+      position: relative;
+      border-radius: 1rem;
+      overflow: hidden;
+      border: 1px solid #1f2937;
+    }
+    .photo-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: brightness(0.75) saturate(0.7);
+      transition: transform 0.5s ease, filter 0.4s ease;
+    }
+    .photo-card:hover img {
+      transform: scale(1.05);
+      filter: brightness(0.85) saturate(0.9);
+    }
+    .photo-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(0,212,170,0.18) 0%, rgba(10,14,26,0.55) 100%);
+      mix-blend-mode: multiply;
+      pointer-events: none;
+    }
+    .photo-teal-tint {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,212,170,0.15) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .photo-label {
+      position: absolute;
+      bottom: 0.75rem;
+      left: 0.75rem;
+      right: 0.75rem;
+      background: rgba(10,14,26,0.75);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(0,212,170,0.2);
+      border-radius: 0.6rem;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.75rem;
+      color: #f1f5f9;
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #0a0e1a; }
+    ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #00d4aa44; }
+
+    /* ── VIDEO HERO ── */
+    .video-cross { transition: opacity 1.8s cubic-bezier(0.4, 0, 0.2, 1); }
+
+    @keyframes heroIn {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .hero-animate            { animation: heroIn 1.1s cubic-bezier(0.16,1,0.3,1) both; }
+    .hero-animate-delay-1    { animation-delay: 0.1s; }
+    .hero-animate-delay-2    { animation-delay: 0.22s; }
+    .hero-animate-delay-3    { animation-delay: 0.36s; }
+    .hero-animate-delay-4    { animation-delay: 0.52s; }
+
+    @keyframes shimmerText {
+      0%   { background-position: 0% center; }
+      100% { background-position: 200% center; }
+    }
+    .shimmer-text {
+      background: linear-gradient(135deg, #00d4aa 0%, #0ea5e9 40%, #8b5cf6 60%, #00d4aa 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmerText 5s linear infinite;
+    }
+
+    /* scroll chevron */
+    @keyframes scrollBounce {
+      0%, 100% { transform: translateY(0) translateX(-50%); opacity: 0.5; }
+      50%       { transform: translateY(6px) translateX(-50%); opacity: 1; }
+    }
+    .scroll-hint { animation: scrollBounce 2s ease-in-out infinite; }
+
+    /* ── CINEMATIC VIDEO FRAME ── */
+    .cine-frame {
+      position: relative;
+      border-radius: 1.5rem;
+      overflow: hidden;
+      border: 1px solid rgba(0,212,170,0.18);
+      box-shadow: 0 0 0 1px rgba(0,212,170,0.06),
+                  0 0 80px rgba(0,212,170,0.14),
+                  0 40px 100px rgba(0,0,0,0.7);
+    }
+    .cine-corner {
+      position: absolute; width: 28px; height: 28px; pointer-events: none;
+    }
+    .cine-corner::before, .cine-corner::after {
+      content:''; position:absolute; background:#00d4aa; border-radius:2px;
+    }
+    .cine-corner-tl { top:16px; left:16px; }
+    .cine-corner-tl::before { top:0; left:0; width:100%; height:2px; }
+    .cine-corner-tl::after  { top:0; left:0; width:2px; height:100%; }
+    .cine-corner-tr { top:16px; right:16px; }
+    .cine-corner-tr::before { top:0; right:0; width:100%; height:2px; }
+    .cine-corner-tr::after  { top:0; right:0; width:2px; height:100%; }
+    .cine-corner-bl { bottom:16px; left:16px; }
+    .cine-corner-bl::before { bottom:0; left:0; width:100%; height:2px; }
+    .cine-corner-bl::after  { bottom:0; left:0; width:2px; height:100%; }
+    .cine-corner-br { bottom:16px; right:16px; }
+    .cine-corner-br::before { bottom:0; right:0; width:100%; height:2px; }
+    .cine-corner-br::after  { bottom:0; right:0; width:2px; height:100%; }
+
+    /* count-up number flicker in */
+    @keyframes numIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .num-in { animation: numIn 0.5s cubic-bezier(0.16,1,0.3,1) both; }
+  </style>
+</head>
+
+<body x-data="{
+  mobileOpen: false,
+  yearly: false,
+  activeFaq: null,
+  counted: false,
+  prices: {
+    pro:  { monthly: 25, yearly: 20 },
+    biz:  { monthly: 79, yearly: 63 }
+  }
+}">
+
+<!-- ████████████████████████████████████
+     NAVBAR
+████████████████████████████████████ -->
+<nav id="navbar" class="fixed top-0 left-0 right-0 z-50 border-b border-transparent">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+
+    <!-- Logo -->
+    <a href="#" class="flex items-center gap-2.5">
+      <svg width="34" height="34" viewBox="0 0 56 56" fill="none">
+        <rect width="56" height="56" rx="13" fill="#0d1428"/>
+        <!-- Outer greenhouse shape: pointed peak, side walls -->
+        <path d="M28 6 L50 20 L50 50 L6 50 L6 20 Z" stroke="#00d4aa" stroke-width="2.4" fill="none" stroke-linejoin="round"/>
+        <!-- Roof ridge -->
+        <line x1="28" y1="6" x2="28" y2="20" stroke="#00d4aa" stroke-width="2.2"/>
+        <!-- Inner columns dividing 3 bays -->
+        <line x1="18" y1="20" x2="18" y2="50" stroke="#00d4aa" stroke-width="2"/>
+        <line x1="38" y1="20" x2="38" y2="50" stroke="#00d4aa" stroke-width="2"/>
+        <!-- Gothic arch (lancet) in center bay -->
+        <path d="M19 50 L19 36 Q19 27 28 27 Q37 27 37 36 L37 50" stroke="#00d4aa" stroke-width="2.2" fill="none"/>
+        <!-- Arch keystone connects to roof ridge -->
+        <line x1="28" y1="20" x2="28" y2="27" stroke="#00d4aa" stroke-width="1.8"/>
+        <!-- Side bay horizontal transoms -->
+        <line x1="6" y1="35" x2="19" y2="35" stroke="#00d4aa" stroke-width="1.7"/>
+        <line x1="37" y1="35" x2="50" y2="35" stroke="#00d4aa" stroke-width="1.7"/>
+        <!-- Plant stem -->
+        <line x1="28" y1="48" x2="28" y2="38" stroke="#00d4aa" stroke-width="2.2" stroke-linecap="round"/>
+        <!-- Left leaf -->
+        <path d="M28 41 C23 39 21 35 23 32" stroke="#00d4aa" stroke-width="2" stroke-linecap="round" fill="none"/>
+        <!-- Right leaf -->
+        <path d="M28 41 C33 39 35 35 33 32" stroke="#00d4aa" stroke-width="2" stroke-linecap="round" fill="none"/>
+      </svg>
+      <span class="font-black text-lg text-white tracking-tight">ТеплицяПлан</span>
+    </a>
+
+    <!-- Desktop links -->
+    <div class="hidden md:flex items-center gap-8">
+      <a href="#features" class="text-sm text-[#94a3b8] hover:text-white transition-colors">Функції</a>
+      <a href="#how"      class="text-sm text-[#94a3b8] hover:text-white transition-colors">Як це працює</a>
+      <a href="#pricing"  class="text-sm text-[#94a3b8] hover:text-white transition-colors">Ціни</a>
+      <a href="#reviews"  class="text-sm text-[#94a3b8] hover:text-white transition-colors">Відгуки</a>
+    </div>
+
+    <!-- Desktop CTA -->
+    <div class="hidden md:flex items-center gap-3">
+      <a href="/login" class="btn-outline text-sm py-2.5 px-5">Увійти</a>
+      <a href="/register" class="btn-primary text-sm py-2.5 px-5">Спробувати →</a>
+    </div>
+
+    <!-- Hamburger -->
+    <button @click="mobileOpen = !mobileOpen"
+      class="md:hidden p-2 rounded-lg border border-[#1f2937] hover:border-[#00d4aa] transition-colors">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2">
+        <template x-if="!mobileOpen">
+          <g><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></g>
+        </template>
+        <template x-if="mobileOpen">
+          <g><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></g>
+        </template>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Mobile menu -->
+  <div x-show="mobileOpen" x-transition:enter="transition ease-out duration-200"
+    x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0"
+    class="md:hidden bg-[#0f1420] border-b border-[#1f2937] px-5 py-5 space-y-4">
+    <a href="#features" @click="mobileOpen=false" class="block text-[#94a3b8] hover:text-white py-2 transition-colors">Функції</a>
+    <a href="#how"      @click="mobileOpen=false" class="block text-[#94a3b8] hover:text-white py-2 transition-colors">Як це працює</a>
+    <a href="#pricing"  @click="mobileOpen=false" class="block text-[#94a3b8] hover:text-white py-2 transition-colors">Ціни</a>
+    <a href="#reviews"  @click="mobileOpen=false" class="block text-[#94a3b8] hover:text-white py-2 transition-colors">Відгуки</a>
+    <div class="flex flex-col gap-3 pt-2">
+      <a href="/login"    class="btn-outline text-center py-3">Увійти</a>
+      <a href="/register" class="btn-primary justify-center py-3">Спробувати безкоштовно →</a>
+    </div>
+  </div>
+</nav>
+
+
+<!-- ████████████████████████████████████
+     BLOCK 1 — HERO (full-screen video)
+████████████████████████████████████ -->
+<section id="hero" class="relative min-h-screen flex flex-col justify-end overflow-hidden">
+
+  <!-- ── Video backgrounds (crossfade) ── -->
+  <video id="hero-vid-1" autoplay muted loop playsinline
+    class="absolute inset-0 w-full h-full object-cover video-cross"
+    style="z-index:0; opacity:1" src="hero-1.mp4"></video>
+  <video id="hero-vid-2" autoplay muted loop playsinline
+    class="absolute inset-0 w-full h-full object-cover video-cross"
+    style="z-index:0; opacity:0" src="hero-2.mp4"></video>
+
+  <!-- ── Overlay stack ── -->
+  <div class="absolute inset-0 z-1" style="background:rgba(8,12,20,0.58)"></div>
+  <div class="absolute inset-0 z-1" style="background:radial-gradient(ellipse 120% 75% at -5% 95%, rgba(0,212,170,0.24) 0%, transparent 52%)"></div>
+  <div class="absolute inset-0 z-1" style="background:radial-gradient(ellipse 60% 50% at 105% 5%, rgba(14,165,233,0.12) 0%, transparent 50%)"></div>
+  <div class="absolute inset-0 z-1" style="background-image:linear-gradient(rgba(0,212,170,0.022) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,170,0.022) 1px,transparent 1px);background-size:64px 64px"></div>
+  <div class="absolute inset-x-0 top-0 z-1 h-40" style="background:linear-gradient(to bottom,rgba(8,12,20,0.88) 0%,transparent 100%)"></div>
+  <div class="absolute inset-x-0 bottom-0 z-1 h-72" style="background:linear-gradient(to top,#0a0e1a 0%,rgba(8,12,20,0.4) 60%,transparent 100%)"></div>
+
+  <!-- ── Hero content ── -->
+  <div class="relative z-10 w-full px-5 sm:px-10 lg:px-20 pb-28 pt-24">
+    <div class="max-w-7xl mx-auto">
+
+      <!-- Badge -->
+      <div class="inline-flex items-center gap-2.5 bg-[rgba(0,212,170,0.09)] border border-[rgba(0,212,170,0.28)] rounded-full px-4 py-1.5 mb-8 hero-animate backdrop-blur-sm">
+        <span class="w-1.5 h-1.5 rounded-full bg-[#00d4aa] pulse-dot"></span>
+        <span class="text-[#00d4aa] text-xs font-bold tracking-[0.15em] uppercase">🌱 Новинка 2026</span>
+      </div>
+
+      <!-- Headline -->
+      <h1 class="font-black leading-[0.9] tracking-tight mb-7 hero-animate hero-animate-delay-1 overflow-hidden"
+        style="font-size:clamp(3rem,6.5vw,7rem)">
+        <span class="block text-white drop-shadow-lg">Розумне</span>
+        <span class="block shimmer-text">управління</span>
+        <span class="block text-white drop-shadow-lg">тепличним бізнесом</span>
+      </h1>
+
+      <!-- Subheadline -->
+      <p class="text-[#94a3b8] leading-relaxed max-w-xl mb-10 hero-animate hero-animate-delay-2"
+        style="font-size:clamp(1rem,2vw,1.25rem)">
+        Плануйте посадки, контролюйте мікроклімат і прогнозуйте прибуток&nbsp;— все в одній платформі
+      </p>
+
+      <!-- CTAs -->
+      <div class="flex flex-col sm:flex-row gap-4 mb-16 hero-animate hero-animate-delay-3">
+        <a href="/register" class="btn-primary text-base backdrop-blur-sm">Спробувати безкоштовно →</a>
+        <a href="#how" class="btn-outline text-base backdrop-blur-sm">▶ Переглянути демо</a>
+      </div>
+
+      <!-- Stats strip -->
+      <div class="flex flex-wrap gap-8 sm:gap-14 hero-animate hero-animate-delay-4">
+        <div>
+          <p class="font-black text-white" style="font-size:clamp(1.8rem,3.5vw,2.8rem)">500<span class="text-[#00d4aa]">+</span></p>
+          <p class="text-[#64748b] text-xs mt-0.5 uppercase tracking-widest">активних теплиць</p>
+        </div>
+        <div class="w-px bg-white/8 self-stretch hidden sm:block"></div>
+        <div>
+          <p class="font-black text-white" style="font-size:clamp(1.8rem,3.5vw,2.8rem)">184<span class="text-[#00d4aa]">%</span></p>
+          <p class="text-[#64748b] text-xs mt-0.5 uppercase tracking-widest">середній ROI</p>
+        </div>
+        <div class="w-px bg-white/8 self-stretch hidden sm:block"></div>
+        <div>
+          <p class="font-black text-white" style="font-size:clamp(1.8rem,3.5vw,2.8rem)">3<span class="text-[#00d4aa]">×</span></p>
+          <p class="text-[#64748b] text-xs mt-0.5 uppercase tracking-widest">більше врожаю</p>
+        </div>
+        <div class="w-px bg-white/8 self-stretch hidden sm:block"></div>
+        <div>
+          <p class="font-black text-white flex items-center gap-2" style="font-size:clamp(1.8rem,3.5vw,2.8rem)">
+            <span class="flex items-center gap-1.5 text-xs font-medium text-[#94a3b8]" style="font-size:0.7rem">
+              <span class="flex items-center gap-1.5">
+                <svg width="12" height="12" fill="none" stroke="#00d4aa" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Без кредитки
+              </span>
+            </span>
+          </p>
+          <p class="font-black text-white flex items-center gap-2" style="font-size:0.85rem;margin-top:4px">
+            <svg width="12" height="12" fill="none" stroke="#00d4aa" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            <span class="text-[#64748b]">14 днів безкоштовно</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll hint -->
+  <div class="scroll-hint absolute bottom-7 left-1/2 z-20 flex flex-col items-center gap-1.5">
+    <span class="text-[9px] text-[#64748b] uppercase tracking-[0.2em]">Scroll</span>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2">
+      <path d="M7 13l5 5 5-5M7 7l5 5 5-5"/>
+    </svg>
+  </div>
+</section>
+
+
+<!-- ████████████████████████████████████
+     BLOCK 2 — SOCIAL PROOF
+████████████████████████████████████ -->
+<section class="py-16 border-y border-[#1f2937]" style="background:#0f1420">
+
+  <!-- Marquee -->
+  <div class="marquee-wrap mb-12">
+    <div class="marquee-track">
+      <template x-for="i in 2">
+        <div class="flex items-center gap-12" style="display:contents">
+          <span class="text-[#64748b] text-sm font-medium whitespace-nowrap">🌿 АгроПлюс, Полтавщина</span>
+          <span class="text-[#00d4aa]">✦</span>
+          <span class="text-[#64748b] text-sm font-medium whitespace-nowrap">🌿 Зелена долина, Київ</span>
+          <span class="text-[#00d4aa]">✦</span>
+          <span class="text-[#64748b] text-sm font-medium whitespace-nowrap">🌿 ФГ Мельник, Львів</span>
+          <span class="text-[#00d4aa]">✦</span>
+          <span class="text-[#64748b] text-sm font-medium whitespace-nowrap">🌿 Сонячна теплиця, Одеса</span>
+          <span class="text-[#00d4aa]">✦</span>
+          <span class="text-[#64748b] text-sm font-medium whitespace-nowrap">🌿 УкрАгро, Харків</span>
+          <span class="text-[#00d4aa]">✦</span>
+          <span class="text-[#64748b] text-sm font-medium whitespace-nowrap">🌿 Нивка-Агро, Вінниця</span>
+          <span class="text-[#00d4aa]">✦</span>
+          <span class="text-[#64748b] text-sm font-medium whitespace-nowrap">🌿 ЕкоТепло, Дніпро</span>
+          <span class="text-[#00d4aa]">✦</span>
+        </div>
+      </template>
+      <!-- duplicate for seamless loop -->
+      <span class="text-[#64748b] text-sm font-medium whitespace-nowrap">🌿 АгроПлюс, Полтавщина</span>
+      <span class="text-[#00d4aa]">✦</span>
+      <span class="text-[#64748b] text-sm font-medium whitespace-nowrap">🌿 Зелена долина, Київ</span>
+      <span class="text-[#00d4aa]">✦</span>
+      <span class="text-[#64748b] text-sm font-medium whitespace-nowrap">🌿 ФГ Мельник, Львів</span>
+      <span class="text-[#00d4aa]">✦</span>
+      <span class="text-[#64748b] text-sm font-medium whitespace-nowrap">🌿 Сонячна теплиця, Одеса</span>
+      <span class="text-[#00d4aa]">✦</span>
+    </div>
+  </div>
+
+  <p class="text-center text-sm font-semibold text-[#64748b] uppercase tracking-widest mb-10"
+    data-aos="fade-up">Довіряють 500+ тепличних господарств України</p>
+
+  <!-- Stats -->
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 grid grid-cols-2 sm:grid-cols-4 gap-6"
+    id="stats-section">
+    <div data-aos="fade-up" data-aos-delay="0" class="text-center">
+      <p class="text-4xl font-black text-accent mb-1" data-count="500" data-suffix="+">0</p>
+      <p class="text-sm text-[#94a3b8]">Теплиць</p>
+    </div>
+    <div data-aos="fade-up" data-aos-delay="100" class="text-center">
+      <p class="text-4xl font-black text-accent mb-1" data-count="98" data-suffix="%">0</p>
+      <p class="text-sm text-[#94a3b8]">Задоволених фермерів</p>
+    </div>
+    <div data-aos="fade-up" data-aos-delay="200" class="text-center">
+      <p class="text-4xl font-black text-accent mb-1" data-count="2.4" data-suffix="x" data-float="true">0</p>
+      <p class="text-sm text-[#94a3b8]">Більше врожаю</p>
+    </div>
+    <div data-aos="fade-up" data-aos-delay="300" class="text-center">
+      <p class="text-4xl font-black text-accent mb-1" data-count="35" data-suffix="%">0</p>
+      <p class="text-sm text-[#94a3b8]">Економія ресурсів</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ████████████████████████████████████
+     CINEMATIC VIDEO SHOWCASE
+████████████████████████████████████ -->
+<section class="py-20 px-4 sm:px-8 lg:px-12" style="background:#0a0e1a">
+  <div class="max-w-7xl mx-auto">
+
+    <!-- Section label -->
+    <div class="text-center mb-10" data-aos="fade-up">
+      <p class="text-xs font-bold text-[#00d4aa] uppercase tracking-[0.2em] mb-3">В дії</p>
+      <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black leading-tight">
+        Дивіться на свою теплицю<br class="hidden sm:block"/>
+        <span class="shimmer-text">по‑новому</span>
+      </h2>
+    </div>
+
+    <!-- Cinematic frame -->
+    <div class="cine-frame" style="aspect-ratio:16/7" data-aos="zoom-in" data-aos-duration="900">
+
+      <!-- Video -->
+      <video autoplay muted loop playsinline
+        class="absolute inset-0 w-full h-full object-cover"
+        src="hero-2.mp4"></video>
+
+      <!-- Overlay stack -->
+      <div class="absolute inset-0" style="background:rgba(8,12,20,0.52)"></div>
+      <div class="absolute inset-0" style="background:radial-gradient(ellipse 70% 90% at 15% 50%, rgba(0,212,170,0.18) 0%, transparent 55%)"></div>
+      <div class="absolute inset-0" style="background:radial-gradient(ellipse 50% 60% at 85% 20%, rgba(14,165,233,0.1) 0%, transparent 50%)"></div>
+      <div class="absolute inset-x-0 bottom-0" style="height:65%;background:linear-gradient(to top,rgba(8,12,20,0.95) 0%,rgba(8,12,20,0.4) 50%,transparent 100%)"></div>
+      <div class="absolute inset-x-0 top-0" style="height:30%;background:linear-gradient(to bottom,rgba(8,12,20,0.6) 0%,transparent 100%)"></div>
+
+      <!-- Corner brackets -->
+      <div class="cine-corner cine-corner-tl"></div>
+      <div class="cine-corner cine-corner-tr"></div>
+      <div class="cine-corner cine-corner-bl"></div>
+      <div class="cine-corner cine-corner-br"></div>
+
+      <!-- REC badge -->
+      <div class="absolute top-5 left-5 sm:top-7 sm:left-7 z-10 flex items-center gap-2 text-[10px] font-bold text-white/70 uppercase tracking-widest">
+        <span class="w-2 h-2 rounded-full bg-red-500 pulse-dot inline-block"></span>
+        REC
+      </div>
+
+      <!-- Stats overlay (bottom) -->
+      <div id="vid-stats-section" class="absolute inset-x-0 bottom-0 z-10 px-6 sm:px-12 pb-8 sm:pb-10">
+        <div class="flex flex-wrap gap-6 sm:gap-14 items-end">
+          <div>
+            <p class="font-black text-white leading-none"
+              style="font-size:clamp(2rem,4.5vw,3.5rem)"
+              data-count="847" data-suffix="кг" data-vid-stat>—</p>
+            <p class="text-[#64748b] text-xs mt-1.5 uppercase tracking-widest">врожаю за сезон</p>
+          </div>
+          <div class="w-px bg-white/10 self-stretch hidden sm:block" style="min-height:3rem"></div>
+          <div>
+            <p class="font-black text-[#00d4aa] leading-none"
+              style="font-size:clamp(2rem,4.5vw,3.5rem)"
+              data-count="184" data-suffix="%" data-vid-stat>—</p>
+            <p class="text-[#64748b] text-xs mt-1.5 uppercase tracking-widest">ROI у першому сезоні</p>
+          </div>
+          <div class="w-px bg-white/10 self-stretch hidden sm:block" style="min-height:3rem"></div>
+          <div>
+            <p class="font-black text-white leading-none"
+              style="font-size:clamp(2rem,4.5vw,3.5rem)"
+              data-count="500" data-suffix="+" data-vid-stat>—</p>
+            <p class="text-[#64748b] text-xs mt-1.5 uppercase tracking-widest">активних теплиць</p>
+          </div>
+          <div class="w-px bg-white/10 self-stretch hidden sm:block" style="min-height:3rem"></div>
+          <div>
+            <p class="font-black text-[#0ea5e9] leading-none"
+              style="font-size:clamp(2rem,4.5vw,3.5rem)"
+              data-count="2.4" data-suffix="M+" data-float="true" data-vid-stat>—</p>
+            <p class="text-[#64748b] text-xs mt-1.5 uppercase tracking-widest">показань сенсорів</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Caption strip -->
+    <div class="flex flex-wrap items-center justify-between gap-4 mt-5 px-1" data-aos="fade-up">
+      <p class="text-[#64748b] text-sm">
+        Від 50 м² до 5 гектарів — ТеплицяПлан масштабується разом з вами
+      </p>
+      <a href="/register" class="text-[#00d4aa] text-sm font-semibold hover:text-white transition-colors flex items-center gap-1.5">
+        Розпочати зараз
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ████████████████████████████████████
+     BLOCK 3 — FEATURES
+████████████████████████████████████ -->
+<section id="features" class="py-24 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-7xl mx-auto">
+
+    <div class="text-center mb-16">
+      <p class="text-xs font-bold text-accent uppercase tracking-widest mb-3" data-aos="fade-up">Можливості</p>
+      <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black mb-5" data-aos="fade-up" data-aos-delay="60">
+        Все що потрібно для сучасної теплиці
+      </h2>
+      <p class="text-[#94a3b8] text-lg max-w-xl mx-auto" data-aos="fade-up" data-aos-delay="120">
+        Від планування до збуту — єдина платформа для всього тепличного циклу.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+
+      <div class="feature-card" data-aos="fade-up" data-aos-delay="0">
+        <div class="text-3xl mb-4">🗺</div>
+        <h3 class="font-bold text-lg text-white mb-3">Планувальник теплиці</h3>
+        <p class="text-[#94a3b8] text-sm leading-relaxed">Малюйте форму теплиці на інтерактивній сітці, розміщуйте зони культур і обладнання з drag-and-drop простотою.</p>
+        <div class="mt-5 pt-4 border-t border-[#1f2937] flex items-center gap-2 text-xs text-accent font-semibold">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          Спробувати планувальник
+        </div>
+      </div>
+
+      <div class="feature-card" data-aos="fade-up" data-aos-delay="80">
+        <div class="text-3xl mb-4">📊</div>
+        <h3 class="font-bold text-lg text-white mb-3">Прогноз врожаю і прибутку</h3>
+        <p class="text-[#94a3b8] text-sm leading-relaxed">Математична модель розраховує очікуваний врожай, доходи і ROI до початку посадки. Точність 92%.</p>
+        <div class="mt-5 pt-4 border-t border-[#1f2937] flex items-center gap-2 text-xs text-accent font-semibold">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          Побачити прогноз
+        </div>
+      </div>
+
+      <div class="feature-card" data-aos="fade-up" data-aos-delay="160">
+        <div class="text-3xl mb-4">🌡</div>
+        <h3 class="font-bold text-lg text-white mb-3">Моніторинг мікроклімату</h3>
+        <p class="text-[#94a3b8] text-sm leading-relaxed">Датчики температури, вологості і CO₂ у реальному часі з автоматичними алертами при відхиленнях від норми.</p>
+        <div class="mt-5 pt-4 border-t border-[#1f2937] flex items-center gap-2 text-xs text-accent font-semibold">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          Підключити датчики
+        </div>
+      </div>
+
+      <div class="feature-card" data-aos="fade-up" data-aos-delay="0">
+        <div class="text-3xl mb-4">💧</div>
+        <h3 class="font-bold text-lg text-white mb-3">Автоматичний полив</h3>
+        <p class="text-[#94a3b8] text-sm leading-relaxed">Система генерує графік поливу по фазах росту кожної культури автоматично. Економія води до 40%.</p>
+        <div class="mt-5 pt-4 border-t border-[#1f2937] flex items-center gap-2 text-xs text-accent font-semibold">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          Налаштувати полив
+        </div>
+      </div>
+
+      <div class="feature-card" data-aos="fade-up" data-aos-delay="80">
+        <div class="text-3xl mb-4">📈</div>
+        <h3 class="font-bold text-lg text-white mb-3">Ринкові ціни</h3>
+        <p class="text-[#94a3b8] text-sm leading-relaxed">Актуальні ціни на культури по регіонах щодня — продавайте у правильний час і максимізуйте виручку.</p>
+        <div class="mt-5 pt-4 border-t border-[#1f2937] flex items-center gap-2 text-xs text-accent font-semibold">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          Дивитись ціни
+        </div>
+      </div>
+
+      <div class="feature-card" data-aos="fade-up" data-aos-delay="160">
+        <div class="text-3xl mb-4">🌿</div>
+        <h3 class="font-bold text-lg text-white mb-3">Каталог культур</h3>
+        <p class="text-[#94a3b8] text-sm leading-relaxed">База агрономічних норм для 50+ культур з нормами поливу, добрив і щільності посадки. Постійно оновлюється.</p>
+        <div class="mt-5 pt-4 border-t border-[#1f2937] flex items-center gap-2 text-xs text-accent font-semibold">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          Переглянути каталог
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ████████████████████████████████████
+     BLOCK 4 — HOW IT WORKS
+████████████████████████████████████ -->
+<section id="how" class="py-24 px-4 sm:px-6 lg:px-8 border-y border-[#1f2937]" style="background:#0f1420">
+  <div class="max-w-5xl mx-auto">
+
+    <div class="text-center mb-16">
+      <p class="text-xs font-bold text-accent uppercase tracking-widest mb-3" data-aos="fade-up">Як це працює</p>
+      <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black" data-aos="fade-up" data-aos-delay="60">
+        Від реєстрації до першого прогнозу<br class="hidden sm:block"/> за 10 хвилин
+      </h2>
+    </div>
+
+    <!-- Steps -->
+    <div class="flex flex-col md:flex-row items-start md:items-stretch gap-0 md:gap-0">
+
+      <!-- Step 1 -->
+      <div class="flex-1 flex flex-col" data-aos="fade-right" data-aos-delay="0">
+        <div class="glass-card p-7 flex-1" style="border-color:rgba(0,212,170,0.25)">
+          <div class="text-4xl mb-4">🏗</div>
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-black text-[#0a0e1a]" style="background:#00d4aa">1</div>
+            <h3 class="font-bold text-lg text-white">Створіть теплицю</h3>
+          </div>
+          <p class="text-[#94a3b8] text-sm leading-relaxed">Намалюйте план, задайте площу і тип опалення. Конфігуратор проведе вас за 2 хвилини.</p>
+        </div>
+      </div>
+
+      <!-- Connector -->
+      <div class="hidden md:flex items-center px-3 shrink-0 pt-6">
+        <div class="step-line w-16"></div>
+      </div>
+      <div class="flex md:hidden justify-center my-0 py-3">
+        <div class="w-0.5 h-8" style="background:linear-gradient(to bottom,#00d4aa,rgba(0,212,170,0.1))"></div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="flex-1 flex flex-col" data-aos="fade-right" data-aos-delay="150">
+        <div class="glass-card p-7 flex-1">
+          <div class="text-4xl mb-4">🌱</div>
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-black text-[#0a0e1a]" style="background:#00d4aa">2</div>
+            <h3 class="font-bold text-lg text-white">Посадіть культури</h3>
+          </div>
+          <p class="text-[#94a3b8] text-sm leading-relaxed">Оберіть рослини з каталогу, призначте зони, вкажіть дати — система прорахує все автоматично.</p>
+        </div>
+      </div>
+
+      <!-- Connector -->
+      <div class="hidden md:flex items-center px-3 shrink-0 pt-6">
+        <div class="step-line w-16"></div>
+      </div>
+      <div class="flex md:hidden justify-center my-0 py-3">
+        <div class="w-0.5 h-8" style="background:linear-gradient(to bottom,#00d4aa,rgba(0,212,170,0.1))"></div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="flex-1 flex flex-col" data-aos="fade-right" data-aos-delay="300">
+        <div class="glass-card p-7 flex-1" style="border-color:rgba(0,212,170,0.25)">
+          <div class="text-4xl mb-4">📊</div>
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-black text-[#0a0e1a]" style="background:#00d4aa">3</div>
+            <h3 class="font-bold text-lg text-white">Отримайте аналітику</h3>
+          </div>
+          <p class="text-[#94a3b8] text-sm leading-relaxed">Прогноз врожаю, фінансова модель, графіки поливу і добрив готові миттєво. ROI — з першого дня.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ████████████████████████████████████
+     BLOCK 5 — PRICING
+████████████████████████████████████ -->
+<section id="pricing" class="py-24 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-5xl mx-auto">
+
+    <div class="text-center mb-14">
+      <p class="text-xs font-bold text-accent uppercase tracking-widest mb-3" data-aos="fade-up">Ціни</p>
+      <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black mb-8" data-aos="fade-up" data-aos-delay="60">
+        Прості та прозорі ціни
+      </h2>
+      <!-- Toggle -->
+      <div class="toggle-pill mx-auto" data-aos="fade-up" data-aos-delay="120">
+        <button @click="yearly=false" :class="!yearly ? 'active' : ''" class="toggle-option">Щомісяця</button>
+        <button @click="yearly=true"  :class="yearly  ? 'active' : ''" class="toggle-option">
+          Щорічно
+          <span class="ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full"
+            :class="yearly ? 'bg-[#0a0e1a] text-accent' : 'bg-[#00d4aa]/20 text-accent'">-20%</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+
+      <!-- Free -->
+      <div class="glass-card p-7 flex flex-col" data-aos="fade-up" data-aos-delay="0">
+        <p class="text-[#94a3b8] text-sm font-semibold mb-2">БЕЗКОШТОВНО</p>
+        <div class="flex items-end gap-1 mb-6">
+          <span class="text-4xl font-black text-white">$0</span>
+          <span class="text-[#64748b] text-sm pb-1.5">/міс</span>
+        </div>
+        <ul class="space-y-3 text-sm flex-1 mb-8">
+          <li class="flex items-center gap-2.5"><span class="text-accent font-bold">✓</span><span class="text-[#f1f5f9]">1 теплиця</span></li>
+          <li class="flex items-center gap-2.5"><span class="text-accent font-bold">✓</span><span class="text-[#f1f5f9]">До 5 зон</span></li>
+          <li class="flex items-center gap-2.5"><span class="text-accent font-bold">✓</span><span class="text-[#f1f5f9]">Каталог культур</span></li>
+          <li class="flex items-center gap-2.5"><span class="text-accent font-bold">✓</span><span class="text-[#f1f5f9]">Базовий прогноз</span></li>
+          <li class="flex items-center gap-2.5"><span class="text-[#374151] font-bold">✗</span><span class="text-[#64748b]">Ринкові ціни</span></li>
+          <li class="flex items-center gap-2.5"><span class="text-[#374151] font-bold">✗</span><span class="text-[#64748b]">Датчики клімату</span></li>
+          <li class="flex items-center gap-2.5"><span class="text-[#374151] font-bold">✗</span><span class="text-[#64748b]">Необмежені плани</span></li>
+        </ul>
+        <a href="/register" class="btn-outline text-sm py-3 text-center">Почати безкоштовно</a>
+      </div>
+
+      <!-- PRO — featured -->
+      <div class="relative flex flex-col" data-aos="fade-up" data-aos-delay="100">
+        <div class="absolute -top-3.5 left-0 right-0 flex justify-center">
+          <span class="bg-[#00d4aa] text-[#0a0e1a] text-[11px] font-black px-4 py-1 rounded-full tracking-wide">Популярний</span>
+        </div>
+        <div class="glass-card p-7 flex flex-col flex-1 accent-glow" style="border-color:rgba(0,212,170,0.45)">
+          <p class="text-accent text-sm font-bold mb-2">PRO</p>
+          <div class="flex items-end gap-1 mb-6">
+            <span class="text-4xl font-black text-white" x-text="'$' + (yearly ? prices.pro.yearly : prices.pro.monthly)">$25</span>
+            <span class="text-[#64748b] text-sm pb-1.5">/міс</span>
+          </div>
+          <ul class="space-y-3 text-sm flex-1 mb-8">
+            <li class="flex items-center gap-2.5"><span class="text-accent font-bold">✓</span><span class="text-[#f1f5f9]">Необмежено теплиць</span></li>
+            <li class="flex items-center gap-2.5"><span class="text-accent font-bold">✓</span><span class="text-[#f1f5f9]">Необмежено зон</span></li>
+            <li class="flex items-center gap-2.5"><span class="text-accent font-bold">✓</span><span class="text-[#f1f5f9]">Ринкові ціни онлайн</span></li>
+            <li class="flex items-center gap-2.5"><span class="text-accent font-bold">✓</span><span class="text-[#f1f5f9]">Моніторинг датчиків</span></li>
+            <li class="flex items-center gap-2.5"><span class="text-accent font-bold">✓</span><span class="text-[#f1f5f9]">Алерти і сповіщення</span></li>
+            <li class="flex items-center gap-2.5"><span class="text-accent font-bold">✓</span><span class="text-[#f1f5f9]">Фінансова аналітика</span></li>
+            <li class="flex items-center gap-2.5"><span class="text-accent font-bold">✓</span><span class="text-[#f1f5f9]">Експорт PDF звітів</span></li>
+          </ul>
+          <a href="/register" class="btn-primary justify-center text-sm py-3">Спробувати 14 днів →</a>
+        </div>
+      </div>
+
+      <!-- Business -->
+      <div class="glass-card p-7 flex flex-col" data-aos="fade-up" data-aos-delay="200">
+        <p class="text-[#94a3b8] text-sm font-semibold mb-2">БІЗНЕС</p>
+        <div class="flex items-end gap-1 mb-6">
+          <span class="text-4xl font-black text-white" x-text="'$' + (yearly ? prices.biz.yearly : prices.biz.monthly)">$79</span>
+          <span class="text-[#64748b] text-sm pb-1.5">/міс</span>
+        </div>
+        <ul class="space-y-3 text-sm flex-1 mb-8">
+          <li class="flex items-center gap-2.5"><span class="text-accent font-bold">✓</span><span class="text-[#f1f5f9]">Все з PRO</span></li>
+          <li class="flex items-center gap-2.5"><span class="text-accent font-bold">✓</span><span class="text-[#f1f5f9]">До 10 користувачів</span></li>
+          <li class="flex items-center gap-2.5"><span class="text-accent font-bold">✓</span><span class="text-[#f1f5f9]">API доступ</span></li>
+          <li class="flex items-center gap-2.5"><span class="text-accent font-bold">✓</span><span class="text-[#f1f5f9]">Пріоритетна підтримка</span></li>
+          <li class="flex items-center gap-2.5"><span class="text-accent font-bold">✓</span><span class="text-[#f1f5f9]">Брендований звіт</span></li>
+          <li class="flex items-center gap-2.5"><span class="text-accent font-bold">✓</span><span class="text-[#f1f5f9]">Онбординг менеджер</span></li>
+          <li class="flex items-center gap-2.5 invisible"><span>—</span><span></span></li>
+        </ul>
+        <a href="mailto:sales@teplyciaplan.ua" class="btn-outline text-sm py-3 text-center">Зв'язатися з нами</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ████████████████████████████████████
+     MARKET NEWS
+████████████████████████████████████ -->
+<section class="py-24 px-4 sm:px-6 lg:px-8 border-t border-[#1f2937]" style="background:#0a0e1a">
+  <div class="max-w-7xl mx-auto">
+
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
+      <div data-aos="fade-up">
+        <p class="text-xs font-bold text-[#00d4aa] uppercase tracking-[0.2em] mb-2">Ринок сьогодні</p>
+        <h2 class="text-3xl sm:text-4xl font-black">Новини, що впливають<br class="hidden sm:block"/> на ціни врожаю</h2>
+      </div>
+      <a href="/dashboard" class="text-sm text-[#00d4aa] font-semibold hover:text-white transition-colors flex items-center gap-1.5 shrink-0" data-aos="fade-up">
+        Усі новини в додатку
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+
+    <!-- News grid: 2 big + 4 small -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+      <!-- Big card 1 -->
+      <div class="glass-card p-6 lg:col-span-1 flex flex-col justify-between" data-aos="fade-up" data-aos-delay="0"
+        style="border-color:rgba(0,212,170,0.2)">
+        <div>
+          <div class="flex items-center gap-2 mb-4">
+            <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full" style="background:rgba(34,197,94,0.12);color:#22c55e">
+              ↑ +18%
+            </span>
+            <span class="text-[10px] text-[#64748b] uppercase tracking-widest">Томати</span>
+          </div>
+          <h3 class="text-base font-bold text-white mb-2 leading-snug">
+            Ціна на томати зросла на 18% — ранній літній попит перевищив пропозицію
+          </h3>
+          <p class="text-sm text-[#64748b] leading-relaxed">
+            Роздрібні ринки Києва та Харкова зафіксували стрибок ціни з 42 до 50 грн/кг. Аналітики пов'язують зі зниженням імпорту з Туреччини та посухою на півдні.
+          </p>
+        </div>
+        <div class="flex items-center justify-between mt-5 pt-4 border-t border-[#1f2937]">
+          <span class="text-xs text-[#64748b]">09 трав. 2026</span>
+          <span class="text-xs text-[#00d4aa] font-semibold">Вплив: HIGH</span>
+        </div>
+      </div>
+
+      <!-- Big card 2 -->
+      <div class="glass-card p-6 lg:col-span-1 flex flex-col justify-between" data-aos="fade-up" data-aos-delay="80"
+        style="border-color:rgba(239,68,68,0.18)">
+        <div>
+          <div class="flex items-center gap-2 mb-4">
+            <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full" style="background:rgba(239,68,68,0.12);color:#ef4444">
+              ↓ −12%
+            </span>
+            <span class="text-[10px] text-[#64748b] uppercase tracking-widest">Огірки</span>
+          </div>
+          <h3 class="text-base font-bold text-white mb-2 leading-snug">
+            Надлишок огірків на ринку — тепличні господарства Херсонщини нарощують обсяги
+          </h3>
+          <p class="text-sm text-[#64748b] leading-relaxed">
+            Оптова ціна впала з 28 до 24 грн/кг. Рекомендуємо переглянути план посадки та перенести частину площі під перець або зелень.
+          </p>
+        </div>
+        <div class="flex items-center justify-between mt-5 pt-4 border-t border-[#1f2937]">
+          <span class="text-xs text-[#64748b]">08 трав. 2026</span>
+          <span class="text-xs text-[#ef4444] font-semibold">Вплив: HIGH</span>
+        </div>
+      </div>
+
+      <!-- Right column — 3 small cards stacked -->
+      <div class="flex flex-col gap-4 lg:col-span-1">
+
+        <div class="glass-card p-5 flex gap-4 items-start" data-aos="fade-up" data-aos-delay="0">
+          <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full shrink-0 mt-0.5" style="background:rgba(34,197,94,0.12);color:#22c55e">↑ +32%</span>
+          <div>
+            <p class="text-xs font-bold text-white mb-1">Попит на зелень зріс у ресторанному секторі</p>
+            <p class="text-[11px] text-[#64748b] leading-relaxed">Базилік, петрушка і руккола — ціна піднялась до 320 грн/кг оптом. Сезон травень–серпень.</p>
+            <p class="text-[10px] text-[#64748b] mt-2">07 трав. 2026 · <span class="text-[#fbbf24]">MEDIUM</span></p>
+          </div>
+        </div>
+
+        <div class="glass-card p-5 flex gap-4 items-start" data-aos="fade-up" data-aos-delay="60">
+          <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full shrink-0 mt-0.5" style="background:rgba(239,68,68,0.12);color:#ef4444">↓ Дефіцит</span>
+          <div>
+            <p class="text-xs font-bold text-white mb-1">Заморозки пошкодили врожай перцю на Сході</p>
+            <p class="text-[11px] text-[#64748b] leading-relaxed">Тепличне виробництво має шанс закрити дефіцит. Ціна на перець +22% за тиждень.</p>
+            <p class="text-[10px] text-[#64748b] mt-2">06 трав. 2026 · <span class="text-[#00d4aa]">HIGH</span></p>
+          </div>
+        </div>
+
+        <div class="glass-card p-5 flex gap-4 items-start" data-aos="fade-up" data-aos-delay="120">
+          <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full shrink-0 mt-0.5" style="background:rgba(0,212,170,0.1);color:#00d4aa">↑ Субсидія</span>
+          <div>
+            <p class="text-xs font-bold text-white mb-1">Держсубсидії на тепличне виробництво продовжено до 2027 р.</p>
+            <p class="text-[11px] text-[#64748b] leading-relaxed">Мінагро продовжило програму: до 30% компенсація витрат на обладнання та енергоносії.</p>
+            <p class="text-[10px] text-[#64748b] mt-2">05 трав. 2026 · <span class="text-[#fbbf24]">MEDIUM</span></p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Ticker strip -->
+    <div class="mt-8 rounded-xl overflow-hidden border border-[#1f2937]" style="background:#0f1420" data-aos="fade-up">
+      <div class="flex items-center">
+        <div class="px-4 py-2.5 shrink-0 text-[10px] font-bold text-[#00d4aa] uppercase tracking-wider border-r border-[#1f2937]">
+          ЦІНИ
+        </div>
+        <div class="marquee-wrap flex-1">
+          <div class="marquee-track py-2.5" style="animation-duration:22s">
+            <span class="text-[11px] text-[#94a3b8] whitespace-nowrap">🍅 Томат <span class="text-[#22c55e] font-semibold">50 грн/кг ↑</span></span>
+            <span class="text-[#1f2937] mx-3">|</span>
+            <span class="text-[11px] text-[#94a3b8] whitespace-nowrap">🥒 Огірок <span class="text-[#ef4444] font-semibold">24 грн/кг ↓</span></span>
+            <span class="text-[#1f2937] mx-3">|</span>
+            <span class="text-[11px] text-[#94a3b8] whitespace-nowrap">🌶 Перець <span class="text-[#22c55e] font-semibold">95 грн/кг ↑</span></span>
+            <span class="text-[#1f2937] mx-3">|</span>
+            <span class="text-[11px] text-[#94a3b8] whitespace-nowrap">🌿 Базилік <span class="text-[#22c55e] font-semibold">320 грн/кг ↑</span></span>
+            <span class="text-[#1f2937] mx-3">|</span>
+            <span class="text-[11px] text-[#94a3b8] whitespace-nowrap">🥬 Салат <span class="text-[#94a3b8] font-semibold">38 грн/кг →</span></span>
+            <span class="text-[#1f2937] mx-3">|</span>
+            <span class="text-[11px] text-[#94a3b8] whitespace-nowrap">🍓 Полуниця <span class="text-[#22c55e] font-semibold">180 грн/кг ↑</span></span>
+            <span class="text-[#1f2937] mx-3">|</span>
+            <span class="text-[11px] text-[#94a3b8] whitespace-nowrap">🧅 Зелена цибуля <span class="text-[#ef4444] font-semibold">28 грн/кг ↓</span></span>
+            <span class="text-[#1f2937] mx-3">|</span>
+            <span class="text-[11px] text-[#94a3b8] whitespace-nowrap">🌱 Шпинат <span class="text-[#22c55e] font-semibold">55 грн/кг ↑</span></span>
+            <span class="text-[#1f2937] mx-3">|</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ████████████████████████████████████
+     BLOCK 6 — REVIEWS + CTA
+████████████████████████████████████ -->
+<section id="reviews" class="py-24 px-4 sm:px-6 lg:px-8 border-t border-[#1f2937]" style="background:#0f1420">
+  <div class="max-w-5xl mx-auto">
+
+    <div class="text-center mb-14">
+      <p class="text-xs font-bold text-accent uppercase tracking-widest mb-3" data-aos="fade-up">Відгуки</p>
+      <h2 class="text-3xl sm:text-4xl font-black" data-aos="fade-up" data-aos-delay="60">
+        Що кажуть наші клієнти
+      </h2>
+    </div>
+
+    <!-- Row 1 -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-5">
+
+      <div class="glass-card p-6" data-aos="fade-up" data-aos-delay="0">
+        <div class="flex items-center justify-between mb-4">
+          <span style="color:#fbbf24;letter-spacing:1px">★★★★★</span>
+          <span class="text-[10px] text-[#64748b]">Травень 2026</span>
+        </div>
+        <p class="text-[#94a3b8] text-sm leading-relaxed mb-5">
+          "За перший місяць скоротив витрати на воду на 38%. Графік поливу тепер повністю автоматичний — я просто слідкую за дашбордом і реагую на алерти."
+        </p>
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full overflow-hidden shrink-0 border-2" style="border-color:rgba(0,212,170,0.35)">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=80&h=80&q=80" alt="" class="w-full h-full object-cover"/>
+          </div>
+          <div>
+            <p class="text-sm font-bold text-white">Василь Коваленко</p>
+            <p class="text-xs text-[#64748b]">ТГ "АгроПлюс", Полтава</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-card p-6" data-aos="fade-up" data-aos-delay="80">
+        <div class="flex items-center justify-between mb-4">
+          <span style="color:#fbbf24;letter-spacing:1px">★★★★★</span>
+          <span class="text-[10px] text-[#64748b]">Квітень 2026</span>
+        </div>
+        <p class="text-[#94a3b8] text-sm leading-relaxed mb-5">
+          "Нарешті зрозуміла, яка культура приносить реальний прибуток. Фінансові прогнози точні — розбіжність з фактом менше 8%. Рекомендую кожному фермеру."
+        </p>
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full overflow-hidden shrink-0 border-2" style="border-color:rgba(0,212,170,0.35)">
+            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=80&h=80&q=80" alt="" class="w-full h-full object-cover"/>
+          </div>
+          <div>
+            <p class="text-sm font-bold text-white">Оксана Мельник</p>
+            <p class="text-xs text-[#64748b]">Фермер, Львівська обл.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-card p-6" data-aos="fade-up" data-aos-delay="160">
+        <div class="flex items-center justify-between mb-4">
+          <span style="color:#fbbf24;letter-spacing:1px">★★★★</span><span style="color:#374151">★</span>
+          <span class="text-[10px] text-[#64748b]">Березень 2026</span>
+        </div>
+        <p class="text-[#94a3b8] text-sm leading-relaxed mb-5">
+          "Планувальник теплиці — це щось неймовірне. За 5 хвилин розклав зони трьох теплиць і побачив весь план сезону. Шкода, що такого не було раніше."
+        </p>
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full overflow-hidden shrink-0 border-2" style="border-color:rgba(0,212,170,0.35)">
+            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=80&h=80&q=80" alt="" class="w-full h-full object-cover"/>
+          </div>
+          <div>
+            <p class="text-sm font-bold text-white">Андрій Сидоренко</p>
+            <p class="text-xs text-[#64748b]">ФГ "Зелена долина", Київ</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 2 -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-5">
+
+      <div class="glass-card p-6" data-aos="fade-up" data-aos-delay="0">
+        <div class="flex items-center justify-between mb-4">
+          <span style="color:#fbbf24;letter-spacing:1px">★★★★★</span>
+          <span class="text-[10px] text-[#64748b]">Лютий 2026</span>
+        </div>
+        <p class="text-[#94a3b8] text-sm leading-relaxed mb-5">
+          "Моніторинг CO₂ і кисню в реальному часі — це те, чого мені бракувало роками. Тепер отримую алерт на телефон, якщо щось не так. Врятувало томати двічі."
+        </p>
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full overflow-hidden shrink-0 border-2" style="border-color:rgba(0,212,170,0.35)">
+            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=80&h=80&q=80" alt="" class="w-full h-full object-cover"/>
+          </div>
+          <div>
+            <p class="text-sm font-bold text-white">Михайло Бондар</p>
+            <p class="text-xs text-[#64748b]">ТК "Сонячна теплиця", Одеса</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-card p-6" data-aos="fade-up" data-aos-delay="80">
+        <div class="flex items-center justify-between mb-4">
+          <span style="color:#fbbf24;letter-spacing:1px">★★★★★</span>
+          <span class="text-[10px] text-[#64748b]">Січень 2026</span>
+        </div>
+        <p class="text-[#94a3b8] text-sm leading-relaxed mb-5">
+          "Інтеграція ринкових цін — killer feature. Бачу прямо у додатку, коли вигідніше продавати і одразу коригую графік збору. За сезон заробила на 24% більше."
+        </p>
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full overflow-hidden shrink-0 border-2" style="border-color:rgba(0,212,170,0.35)">
+            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=80&h=80&q=80" alt="" class="w-full h-full object-cover"/>
+          </div>
+          <div>
+            <p class="text-sm font-bold text-white">Наталія Федоренко</p>
+            <p class="text-xs text-[#64748b]">Фермер, Вінницька обл.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-card p-6" data-aos="fade-up" data-aos-delay="160">
+        <div class="flex items-center justify-between mb-4">
+          <span style="color:#fbbf24;letter-spacing:1px">★★★★★</span>
+          <span class="text-[10px] text-[#64748b]">Грудень 2025</span>
+        </div>
+        <p class="text-[#94a3b8] text-sm leading-relaxed mb-5">
+          "Підключили 3 теплиці площею 1200 м² за один день. Підтримка відповіла через 20 хвилин і допомогла налаштувати субстрати під конкретні культури."
+        </p>
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full overflow-hidden shrink-0 border-2" style="border-color:rgba(0,212,170,0.35)">
+            <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=80&h=80&q=80" alt="" class="w-full h-full object-cover"/>
+          </div>
+          <div>
+            <p class="text-sm font-bold text-white">Ігор Савченко</p>
+            <p class="text-xs text-[#64748b]">УкрАгро, Харків</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 3 -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-24">
+
+      <div class="glass-card p-6" data-aos="fade-up" data-aos-delay="0" style="border-color:rgba(0,212,170,0.2)">
+        <div class="flex items-center justify-between mb-4">
+          <span style="color:#fbbf24;letter-spacing:1px">★★★★★</span>
+          <span class="text-[10px] text-[#64748b]">Листопад 2025</span>
+        </div>
+        <p class="text-[#94a3b8] text-sm leading-relaxed mb-5">
+          "Спочатку був скептиком. Але після того як прогноз прибутку виявився точнішим за мої власні розрахунки в Excel — повністю перейшов на ТеплицяПлан. ROI у першому сезоні — 210%."
+        </p>
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full overflow-hidden shrink-0 border-2" style="border-color:rgba(0,212,170,0.35)">
+            <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=80&h=80&q=80" alt="" class="w-full h-full object-cover"/>
+          </div>
+          <div>
+            <p class="text-sm font-bold text-white">Руслан Ткаченко</p>
+            <p class="text-xs text-[#64748b]">Нивка-Агро, Вінниця — 2 200 м²</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-card p-6" data-aos="fade-up" data-aos-delay="80" style="border-color:rgba(0,212,170,0.2)">
+        <div class="flex items-center justify-between mb-4">
+          <span style="color:#fbbf24;letter-spacing:1px">★★★★★</span>
+          <span class="text-[10px] text-[#64748b]">Жовтень 2025</span>
+        </div>
+        <p class="text-[#94a3b8] text-sm leading-relaxed mb-5">
+          "Зручніший за все, що я пробувала раніше. Планувальник зон drag-and-drop, автоматичний розрахунок потреби в насінні — і це все в одному місці. Нарешті немає Excel на 40 листків."
+        </p>
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full overflow-hidden shrink-0 border-2" style="border-color:rgba(0,212,170,0.35)">
+            <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=80&h=80&q=80" alt="" class="w-full h-full object-cover"/>
+          </div>
+          <div>
+            <p class="text-sm font-bold text-white">Аліна Кравченко</p>
+            <p class="text-xs text-[#64748b]">ЕкоТепло, Дніпро</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA Block — photo background -->
+    <div class="relative rounded-2xl overflow-hidden" data-aos="fade-up">
+      <!-- Background photo -->
+      <img
+        src="https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&w=1600&q=75"
+        alt="Теплиця вночі"
+        class="absolute inset-0 w-full h-full object-cover"
+        style="filter:brightness(0.35) saturate(0.6)"
+      />
+      <!-- Teal gradient overlay -->
+      <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(0,212,170,0.25) 0%,rgba(10,14,26,0.7) 60%,rgba(10,14,26,0.85) 100%)"></div>
+      <!-- Grid pattern on top -->
+      <div class="absolute inset-0" style="background-image:linear-gradient(rgba(0,212,170,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,170,0.03) 1px,transparent 1px);background-size:40px 40px"></div>
+
+      <!-- Content -->
+      <div class="relative z-10 p-12 sm:p-20 text-center">
+        <div class="inline-flex items-center gap-2.5 bg-[rgba(0,212,170,0.12)] border border-[rgba(0,212,170,0.3)] rounded-full px-4 py-2 text-xs font-bold text-accent mb-6">
+          <span class="w-2 h-2 rounded-full bg-accent pulse-dot inline-block"></span>
+          500+ фермерів вже в системі
+        </div>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black mb-5 leading-tight">
+          Готові вивести теплицю<br/>на новий рівень?
+        </h2>
+        <p class="text-[#94a3b8] text-lg mb-10 max-w-lg mx-auto">
+          Починайте безкоштовно — без кредитної картки, без зобов'язань.
+        </p>
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+          <a href="/register" class="btn-primary text-base px-8 py-4">Спробувати безкоштовно →</a>
+          <a href="#how" class="btn-outline text-base px-8 py-4">▶ Переглянути демо</a>
+        </div>
+        <p class="text-sm text-[#64748b] mt-6">
+          Приєднуйтесь до 500+ фермерів що вже використовують ТеплицяПлан
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ████████████████████████████████████
+     FOOTER
+████████████████████████████████████ -->
+<footer class="border-t border-[#1f2937] py-12 px-4 sm:px-6 lg:px-8" style="background:#0a0e1a">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-10">
+
+      <!-- Brand -->
+      <div class="col-span-2 sm:col-span-1">
+        <a href="#" class="flex items-center gap-2.5 mb-4">
+          <svg width="30" height="30" viewBox="0 0 56 56" fill="none">
+            <rect width="56" height="56" rx="13" fill="#0d1428"/>
+            <path d="M28 6 L50 20 L50 50 L6 50 L6 20 Z" stroke="#00d4aa" stroke-width="2.4" fill="none" stroke-linejoin="round"/>
+            <line x1="28" y1="6" x2="28" y2="20" stroke="#00d4aa" stroke-width="2.2"/>
+            <line x1="18" y1="20" x2="18" y2="50" stroke="#00d4aa" stroke-width="2"/>
+            <line x1="38" y1="20" x2="38" y2="50" stroke="#00d4aa" stroke-width="2"/>
+            <path d="M19 50 L19 36 Q19 27 28 27 Q37 27 37 36 L37 50" stroke="#00d4aa" stroke-width="2.2" fill="none"/>
+            <line x1="28" y1="20" x2="28" y2="27" stroke="#00d4aa" stroke-width="1.8"/>
+            <line x1="6" y1="35" x2="19" y2="35" stroke="#00d4aa" stroke-width="1.7"/>
+            <line x1="37" y1="35" x2="50" y2="35" stroke="#00d4aa" stroke-width="1.7"/>
+            <line x1="28" y1="48" x2="28" y2="38" stroke="#00d4aa" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M28 41 C23 39 21 35 23 32" stroke="#00d4aa" stroke-width="2" stroke-linecap="round" fill="none"/>
+            <path d="M28 41 C33 39 35 35 33 32" stroke="#00d4aa" stroke-width="2" stroke-linecap="round" fill="none"/>
+          </svg>
+          <span class="font-black text-white">ТеплицяПлан</span>
+        </a>
+        <p class="text-xs text-[#64748b] leading-relaxed">Розумне управління тепличним бізнесом для сучасних фермерів України.</p>
+      </div>
+
+      <!-- Product -->
+      <div>
+        <p class="text-xs font-bold text-white uppercase tracking-widest mb-4">Продукт</p>
+        <ul class="space-y-2.5 text-xs text-[#64748b]">
+          <li><a href="#features" class="hover:text-[#00d4aa] transition-colors">Функції</a></li>
+          <li><a href="#pricing"  class="hover:text-[#00d4aa] transition-colors">Ціни</a></li>
+          <li><a href="#how"      class="hover:text-[#00d4aa] transition-colors">Як це працює</a></li>
+          <li><a href="#reviews"  class="hover:text-[#00d4aa] transition-colors">Відгуки</a></li>
+        </ul>
+      </div>
+
+      <!-- Account -->
+      <div>
+        <p class="text-xs font-bold text-white uppercase tracking-widest mb-4">Акаунт</p>
+        <ul class="space-y-2.5 text-xs text-[#64748b]">
+          <li><a href="/login"    class="hover:text-[#00d4aa] transition-colors">Увійти</a></li>
+          <li><a href="/register" class="hover:text-[#00d4aa] transition-colors">Реєстрація</a></li>
+          <li><a href="#"         class="hover:text-[#00d4aa] transition-colors">Документація</a></li>
+          <li><a href="mailto:support@teplyciaplan.ua" class="hover:text-[#00d4aa] transition-colors">Підтримка</a></li>
+        </ul>
+      </div>
+
+      <!-- Socials -->
+      <div>
+        <p class="text-xs font-bold text-white uppercase tracking-widest mb-4">Соцмережі</p>
+        <div class="flex flex-col gap-3">
+          <!-- Instagram -->
+          <a href="#" class="flex items-center gap-2.5 text-xs text-[#64748b] hover:text-[#00d4aa] transition-colors group">
+            <div class="w-7 h-7 rounded-lg flex items-center justify-center border border-[#1f2937] group-hover:border-[rgba(0,212,170,0.3)] transition-colors">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/>
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+              </svg>
+            </div>
+            Instagram
+          </a>
+          <!-- Telegram -->
+          <a href="#" class="flex items-center gap-2.5 text-xs text-[#64748b] hover:text-[#00d4aa] transition-colors group">
+            <div class="w-7 h-7 rounded-lg flex items-center justify-center border border-[#1f2937] group-hover:border-[rgba(0,212,170,0.3)] transition-colors">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              </svg>
+            </div>
+            Telegram
+          </a>
+          <!-- LinkedIn -->
+          <a href="#" class="flex items-center gap-2.5 text-xs text-[#64748b] hover:text-[#00d4aa] transition-colors group">
+            <div class="w-7 h-7 rounded-lg flex items-center justify-center border border-[#1f2937] group-hover:border-[rgba(0,212,170,0.3)] transition-colors">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/>
+                <rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/>
+              </svg>
+            </div>
+            LinkedIn
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="border-t border-[#1f2937] pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p class="text-xs text-[#64748b]">© 2026 ТеплицяПлан. Усі права захищені.</p>
+      <div class="flex gap-6 text-xs text-[#64748b]">
+        <a href="#" class="hover:text-[#00d4aa] transition-colors">Умови використання</a>
+        <a href="#" class="hover:text-[#00d4aa] transition-colors">Політика конфіденційності</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<!-- ████████████████████████████████████
+     SCRIPTS
+████████████████████████████████████ -->
+<script>
+  // AOS
+  AOS.init({ once: true, duration: 700, offset: 50, easing: 'ease-out-cubic' });
+
+  // Navbar scroll
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 30);
+  });
+
+  // Count-up with IntersectionObserver
+  function animateCount(el) {
+    const target = parseFloat(el.dataset.count);
+    const suffix = el.dataset.suffix || '';
+    const isFloat = el.dataset.float === 'true';
+    const duration = 1800;
+    const start = performance.now();
+
+    function update(now) {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      // Ease out cubic
+      const ease = 1 - Math.pow(1 - progress, 3);
+      const current = target * ease;
+      el.textContent = (isFloat ? current.toFixed(1) : Math.floor(current)) + suffix;
+      if (progress < 1) requestAnimationFrame(update);
+    }
+
+    requestAnimationFrame(update);
+  }
+
+  const statsObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.querySelectorAll('[data-count]').forEach(animateCount);
+        statsObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.4 });
+
+  const statsSection = document.getElementById('stats-section');
+  if (statsSection) statsObserver.observe(statsSection);
+
+  // Smooth scroll for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+
+  // ── Hero video crossfade ──────────────────────────────────────
+  (function() {
+    const v1 = document.getElementById('hero-vid-1');
+    const v2 = document.getElementById('hero-vid-2');
+    if (!v1 || !v2) return;
+    let active = 1;
+    const HOLD    = 9000;   // how long each video shows (ms)
+    const FADE    = 1800;   // matches CSS transition (ms)
+    setInterval(() => {
+      if (active === 1) {
+        v2.style.opacity = '1';
+        setTimeout(() => { v1.style.opacity = '0'; }, 300);
+        active = 2;
+      } else {
+        v1.style.opacity = '1';
+        setTimeout(() => { v2.style.opacity = '0'; }, 300);
+        active = 1;
+      }
+    }, HOLD + FADE);
+  })();
+
+  // ── Cinematic stats count-up ──────────────────────────────────
+  function animateVidStat(el) {
+    const target   = parseFloat(el.dataset.count);
+    const suffix   = el.dataset.suffix || '';
+    const isFloat  = el.dataset.float === 'true';
+    const duration = 2200;
+    const start    = performance.now();
+    el.classList.add('num-in');
+    function update(now) {
+      const p    = Math.min((now - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - p, 4);
+      el.textContent = (isFloat ? (target * ease).toFixed(1) : Math.floor(target * ease)) + suffix;
+      if (p < 1) requestAnimationFrame(update);
+    }
+    requestAnimationFrame(update);
+  }
+
+  const vidStatsObs = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.querySelectorAll('[data-vid-stat]').forEach(animateVidStat);
+        vidStatsObs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.35 });
+
+  const vss = document.getElementById('vid-stats-section');
+  if (vss) vidStatsObs.observe(vss);
+</script>
+</body>
+</html>
