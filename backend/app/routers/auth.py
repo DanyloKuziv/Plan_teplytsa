@@ -8,6 +8,7 @@ from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.security import hash_password, verify_password, create_access_token
+from app.core.config import settings
 from app.models.user import User
 from app.schemas.user import UserRegister, UserOut, Token
 
@@ -61,17 +62,23 @@ async def register(
     code = _gen_code()
     expires = datetime.utcnow() + timedelta(minutes=VERIFICATION_TTL_MINUTES)
 
+    auto_verify = not settings.MAIL_ENABLED
+
     user = User(
         id=uuid.uuid4(),
         email=payload.email,
         password_hash=hash_password(payload.password),
         full_name=payload.full_name,
-        is_verified=False,
-        verification_code=code,
-        verification_expires=expires,
+        is_verified=auto_verify,
+        verification_code=None if auto_verify else code,
+        verification_expires=None if auto_verify else expires,
     )
     db.add(user)
     db.commit()
+
+    if auto_verify:
+        token = create_access_token({"sub": str(user.id), "email": user.email, "is_admin": user.is_admin})
+        return {"access_token": token, "token_type": "bearer"}
 
     background_tasks.add_task(_send_verification_bg, payload.email, payload.full_name, code)
     return {"detail": "Verification code sent to your email."}
