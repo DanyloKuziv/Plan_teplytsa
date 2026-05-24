@@ -44,6 +44,8 @@ function RegisterForm({ onSuccess }) {
   const [showPwd, setShowPwd]     = useState(false)
   const [showCfm, setShowCfm]     = useState(false)
   const { addToast }              = useToast()
+  const { login }                 = useAuth()
+  const navigate                  = useNavigate()
 
   function set(key) {
     return (e) => {
@@ -72,8 +74,14 @@ function RegisterForm({ onSuccess }) {
     setLoading(true)
     setEmailExists(false)
     try {
-      await apiRegister(form.email, form.password, form.full_name)
-      onSuccess(form.email)
+      const data = await apiRegister(form.email, form.password, form.full_name)
+      if (data?.access_token) {
+        login(data.access_token)
+        addToast('Акаунт створено! Ласкаво просимо 🌱', 'success')
+        navigate('/dashboard')
+      } else {
+        onSuccess(form.email)
+      }
     } catch (err) {
       const raw = err?.response?.data?.detail || 'Помилка реєстрації'
       const msg = Array.isArray(raw) ? (raw[0]?.msg || String(raw)) : String(raw)
