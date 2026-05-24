@@ -305,7 +305,13 @@ export default function GreenhousePlanner({ zones = [], greenhouseId, greenhouse
     if (!key) return null
     if (key.startsWith('fp:')) return key.slice(3)
     const plantId = key.slice(3)
-    const newFp = await createFarmerPlant({ plant_id: plantId, ...FP_DEFAULTS })
+    const plant = allPlants.find(p => String(p.id) === plantId)
+    const defaults = {
+      ...FP_DEFAULTS,
+      yield_per_m2: plant?.default_yield_per_m2 ?? FP_DEFAULTS.yield_per_m2,
+      sell_price:   plant?.default_sell_price   ?? FP_DEFAULTS.sell_price,
+    }
+    const newFp = await createFarmerPlant({ plant_id: plantId, ...defaults })
     setFarmerPlants(prev => [...prev, newFp])
     return String(newFp.id)
   }
@@ -370,9 +376,9 @@ export default function GreenhousePlanner({ zones = [], greenhouseId, greenhouse
   const growthMod = substrate?.growth_modifier ?? 1.0
   const yieldMod  = substrate?.yield_modifier  ?? 1.0
 
-  // Effective params: use fp values if available, else defaults + catalog plant data
-  const effYieldPerM2 = fp?.yield_per_m2 ?? FP_DEFAULTS.yield_per_m2
-  const effSellPrice  = fp?.sell_price   ?? FP_DEFAULTS.sell_price
+  // Effective params: use fp values if available, else catalog plant defaults, else hardcoded fallback
+  const effYieldPerM2 = fp?.yield_per_m2 ?? genericPlant?.default_yield_per_m2 ?? FP_DEFAULTS.yield_per_m2
+  const effSellPrice  = fp?.sell_price   ?? genericPlant?.default_sell_price   ?? FP_DEFAULTS.sell_price
   const effGrowDays   = genericPlant?.grow_days ?? 30
   const effPlantsM2   = genericPlant?.plants_per_m2 ?? 4
   const effSeedPrice  = fp?.seed_price ?? 2.0

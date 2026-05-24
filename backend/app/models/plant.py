@@ -13,6 +13,8 @@ class Plant(Base):
     grow_days: Mapped[int] = mapped_column(Integer, nullable=False)
     plants_per_m2: Mapped[float] = mapped_column(Float, nullable=False)
     seed_weight_g: Mapped[float] = mapped_column(Float, nullable=False, default=0.01)
+    default_yield_per_m2: Mapped[float] = mapped_column(Float, nullable=False, default=3.0)
+    default_sell_price: Mapped[float] = mapped_column(Float, nullable=False, default=30.0)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     image_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
 
