@@ -33,8 +33,8 @@ function EmailStep({ onSent }) {
     setLoading(true)
     setError('')
     try {
-      await forgotPassword(email)
-      onSent(email)
+      const data = await forgotPassword(email)
+      onSent(email, data?.code || null)
     } catch {
       addToast('Помилка. Спробуйте пізніше.', 'error')
     } finally {
@@ -102,7 +102,7 @@ function EmailStep({ onSent }) {
 }
 
 // ── Step 2: OTP + new password ────────────────────────────────────────────────
-function ResetStep({ email }) {
+function ResetStep({ email, devCode }) {
   const [digits, setDigits]     = useState(['', '', '', '', '', ''])
   const [password, setPassword] = useState('')
   const [showPwd, setShowPwd]   = useState(false)
@@ -195,7 +195,18 @@ function ResetStep({ email }) {
 
       <h1 className="text-3xl font-bold text-white mb-1">Новий пароль</h1>
       <p className="text-white/40 text-sm mb-2">Код відправлено на</p>
-      <p className="text-accent font-semibold text-sm mb-8 truncate">{email}</p>
+      <p className="text-accent font-semibold text-sm mb-4 truncate">{email}</p>
+
+      {devCode && (
+        <div className="flex items-center gap-2 bg-yellow-500/10 border border-yellow-500/30 rounded-xl px-4 py-3 mb-6">
+          <svg width="16" height="16" fill="none" stroke="#eab308" strokeWidth="2" viewBox="0 0 24 24" className="shrink-0">
+            <circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/>
+          </svg>
+          <p className="text-yellow-400 text-sm">
+            Email вимкнено. Ваш код: <span className="font-bold tracking-widest">{devCode}</span>
+          </p>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* OTP boxes */}
@@ -283,8 +294,9 @@ function ResetStep({ email }) {
 
 // ── Page wrapper ──────────────────────────────────────────────────────────────
 export default function ForgotPassword() {
-  const [step, setStep]   = useState('email')
-  const [email, setEmail] = useState('')
+  const [step, setStep]       = useState('email')
+  const [email, setEmail]     = useState('')
+  const [devCode, setDevCode] = useState(null)
 
   return (
     <div className="min-h-screen flex overflow-hidden bg-[#080c14]">
@@ -297,8 +309,8 @@ export default function ForgotPassword() {
         </div>
 
         {step === 'email'
-          ? <EmailStep onSent={e => { setEmail(e); setStep('reset') }} />
-          : <ResetStep email={email} />}
+          ? <EmailStep onSent={(e, code) => { setEmail(e); setDevCode(code); setStep('reset') }} />
+          : <ResetStep email={email} devCode={devCode} />}
       </div>
 
       {/* Right: video */}

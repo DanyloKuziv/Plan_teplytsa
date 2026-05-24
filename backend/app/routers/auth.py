@@ -147,6 +147,9 @@ async def forgot_password(
     user.reset_expires = datetime.utcnow() + timedelta(minutes=VERIFICATION_TTL_MINUTES)
     db.commit()
 
+    if not settings.MAIL_ENABLED:
+        return {"detail": "Код скидання паролю", "code": code}
+
     background_tasks.add_task(_send_reset_bg, user.email, user.full_name, code)
     return {"detail": "If this email exists, a reset code has been sent."}
 
