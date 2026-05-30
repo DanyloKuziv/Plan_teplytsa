@@ -13,7 +13,6 @@ async def send_email(to_email: str, subject: str, html: str) -> bool:
 
 
 async def _send_via_resend(to_email: str, subject: str, html: str) -> bool:
-    from_addr = f"{settings.MAIL_FROM_NAME} <{settings.MAIL_FROM}>"
     try:
         async with httpx.AsyncClient() as client:
             resp = await client.post(
@@ -22,7 +21,7 @@ async def _send_via_resend(to_email: str, subject: str, html: str) -> bool:
                     "Authorization": f"Bearer {settings.RESEND_API_KEY}",
                     "Content-Type": "application/json",
                 },
-                json={"from": from_addr, "to": [to_email], "subject": subject, "html": html},
+                json={"from": "onboarding@resend.dev", "to": [to_email], "subject": subject, "html": html},
                 timeout=15,
             )
             if resp.status_code >= 400:
