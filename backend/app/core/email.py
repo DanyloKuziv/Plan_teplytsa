@@ -13,6 +13,7 @@ async def send_email(to_email: str, subject: str, html: str) -> bool:
 
 
 async def _send_via_resend(to_email: str, subject: str, html: str) -> bool:
+    print(f"[RESEND] Sending to {to_email}, key={'SET' if settings.RESEND_API_KEY else 'EMPTY'}", flush=True)
     try:
         async with httpx.AsyncClient() as client:
             resp = await client.post(
@@ -24,13 +25,12 @@ async def _send_via_resend(to_email: str, subject: str, html: str) -> bool:
                 json={"from": "onboarding@resend.dev", "to": [to_email], "subject": subject, "html": html},
                 timeout=15,
             )
+            print(f"[RESEND] Status {resp.status_code}: {resp.text}", flush=True)
             if resp.status_code >= 400:
-                logger.error("Resend: error %s body=%s", resp.status_code, resp.text)
                 return False
-            logger.info("Resend: sent to %s (status %s)", to_email, resp.status_code)
             return True
     except Exception as exc:
-        logger.error("Resend: failed to %s: %s", to_email, exc)
+        print(f"[RESEND] Exception: {exc}", flush=True)
         return False
 
 
