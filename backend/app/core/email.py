@@ -25,7 +25,9 @@ async def _send_via_resend(to_email: str, subject: str, html: str) -> bool:
                 json={"from": from_addr, "to": [to_email], "subject": subject, "html": html},
                 timeout=15,
             )
-            resp.raise_for_status()
+            if resp.status_code >= 400:
+                logger.error("Resend: error %s body=%s", resp.status_code, resp.text)
+                return False
             logger.info("Resend: sent to %s (status %s)", to_email, resp.status_code)
             return True
     except Exception as exc:

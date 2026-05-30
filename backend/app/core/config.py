@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     # Mail (Resend API — preferred)
     RESEND_API_KEY: str = ""
     MAIL_FROM: str = "onboarding@resend.dev"
-    MAIL_FROM_NAME: str = "ТеплицяПлан"
+    MAIL_FROM_NAME: str = "TeplytsiaPlan"
     MAIL_ENABLED: bool = False
 
     # Mail (SMTP fallback)
