@@ -21,9 +21,9 @@ class UUIDType(TypeDecorator):
             return None
         return uuid.UUID(value)
 
-_is_sqlite = settings.DATABASE_URL.startswith("sqlite")
+_is_sqlite = settings.db_url.startswith("sqlite")
 _connect_args = {"check_same_thread": False} if _is_sqlite else {}
-engine = create_engine(settings.DATABASE_URL, pool_pre_ping=True, connect_args=_connect_args)
+engine = create_engine(settings.db_url, pool_pre_ping=True, connect_args=_connect_args)
 
 if _is_sqlite:
     @event.listens_for(engine, "connect")
