@@ -1,10 +1,12 @@
 import uuid
-from datetime import timedelta
+from datetime import timedelta, date
 from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel
 from sqlalchemy.orm import Session, joinedload
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.greenhouse import Greenhouse
+from app.models.zone import Zone
 from app.models.planting_plan import PlantingPlan
 from app.models.farmer_plant import FarmerPlant
 from app.models.substrate import Substrate
@@ -20,6 +22,11 @@ from app.schemas.irrigation_schedule import IrrigationScheduleOut
 from app.schemas.forecast import ForecastOut
 from app.schemas.analytics import AnalyticsOut, ForecastSummary, HarvestActuals, Deviation
 from app.services.yield_service import calculate_forecast
+
+
+class PlantingPlanUpdate(BaseModel):
+    substrate_id: uuid.UUID | None = None
+    planted_at: date | None = None
 
 router = APIRouter()
 
@@ -60,6 +67,12 @@ def create_planting_plan(
     ).first()
     if not gh:
         raise HTTPException(status_code=404, detail="Greenhouse not found")
+
+    zone = db.query(Zone).filter(
+        Zone.id == payload.zone_id, Zone.greenhouse_id == payload.greenhouse_id
+    ).first()
+    if not zone:
+        raise HTTPException(status_code=404, detail="Zone not found in this greenhouse")
 
     farmer_plant = (
         db.query(FarmerPlant)
@@ -272,3 +285,36 @@ def get_analytics(
         ),
         accuracy_score=round(accuracy, 1),
     )
+
+
+@router.patch("/{plan_id}", response_model=PlantingPlanOut)
+def update_planting_plan(
+    plan_id: uuid.UUID,
+    payload: PlantingPlanUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    plan = _load_plan(plan_id, current_user, db)
+    if payload.substrate_id is not None:
+        substrate = db.query(Substrate).filter_by(id=payload.substrate_id).first()
+        if not substrate:
+            raise HTTPException(status_code=404, detail="Substrate not found")
+        plan.substrate_id = payload.substrate_id
+    if payload.planted_at is not None:
+        grow_days = plan.farmer_plant.plant.grow_days
+        plan.planted_at = payload.planted_at
+        plan.expected_harvest_at = payload.planted_at + timedelta(days=grow_days)
+    db.commit()
+    db.refresh(plan)
+    return plan
+
+
+@router.delete("/{plan_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_planting_plan(
+    plan_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    plan = _load_plan(plan_id, current_user, db)
+    db.delete(plan)
+    db.commit()

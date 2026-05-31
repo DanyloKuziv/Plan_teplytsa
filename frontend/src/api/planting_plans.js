@@ -34,3 +34,12 @@ export async function getAnalytics(id) {
   const { data } = await client.get(`/planting-plans/${id}/analytics`)
   return data
 }
+
+export async function update(id, payload) {
+  const { data } = await client.patch(`/planting-plans/${id}`, payload)
+  return data
+}
+
+export async function deleteById(id) {
+  await client.delete(`/planting-plans/${id}`)
+}

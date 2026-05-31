@@ -48,7 +48,7 @@ def update_zone(zone_id: uuid.UUID, payload: ZoneUpdate, db: Session = Depends(g
     if not zone:
         raise HTTPException(status_code=404, detail="Zone not found")
     _assert_greenhouse_owner(zone.greenhouse_id, current_user, db)
-    for field, value in payload.model_dump(exclude_none=True).items():
+    for field, value in payload.model_dump(exclude_unset=True).items():
         setattr(zone, field, value)
     db.commit()
     db.refresh(zone)

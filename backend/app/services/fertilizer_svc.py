@@ -14,10 +14,24 @@ _PHASE_FRACTIONS = {
 }
 
 
+def _applicable_phases(grow_days: int) -> set[GrowthPhase]:
+    """Return fertilizer phases relevant for a plant's cycle length.
+
+    Short-cycle greens (≤45d) never reach flowering; medium crops (≤70d)
+    skip the distinct flowering phase.
+    """
+    if grow_days <= 45:
+        return {GrowthPhase.seedling, GrowthPhase.growth}
+    if grow_days <= 70:
+        return {GrowthPhase.seedling, GrowthPhase.growth, GrowthPhase.ripening}
+    return {GrowthPhase.seedling, GrowthPhase.growth, GrowthPhase.flowering, GrowthPhase.ripening}
+
+
 def generate_fertilizer_schedules(db: Session, plan: PlantingPlan) -> list[FertilizerSchedule]:
     """Generate weekly fertilizer applications for each growth phase."""
     grow_days = plan.farmer_plant.plant.grow_days
-    fertilizers = db.query(Fertilizer).all()
+    phases = _applicable_phases(grow_days)
+    fertilizers = db.query(Fertilizer).filter(Fertilizer.phase.in_(phases)).all()
 
     schedules: list[FertilizerSchedule] = []
     for fertilizer in fertilizers:

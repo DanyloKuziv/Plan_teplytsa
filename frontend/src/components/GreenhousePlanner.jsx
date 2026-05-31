@@ -4,7 +4,7 @@ import { update as updateZone } from '../api/zones.js'
 import { getAll as getFarmerPlants, create as createFarmerPlant } from '../api/farmerPlants.js'
 import { getAll as getAllPlants } from '../api/plants.js'
 import { getAll as getSubstrates } from '../api/substrates.js'
-import { create as createPlantingPlan } from '../api/planting_plans.js'
+import { create as createPlantingPlan, getByGreenhouse as getPlansByGreenhouse, deleteById as deletePlan } from '../api/planting_plans.js'
 import { update as updateGreenhouse } from '../api/greenhouses.js'
 import { useToast } from '../context/ToastContext.jsx'
 
@@ -131,6 +131,8 @@ export default function GreenhousePlanner({ zones = [], greenhouseId, greenhouse
   const [farmerPlants, setFarmerPlants] = useState([])
   const [allPlants, setAllPlants]       = useState([])
   const [substrates, setSubstrates]     = useState([])
+  const [existingPlans, setExistingPlans] = useState([])
+  const [deletingPlan, setDeletingPlan] = useState(false)
 
   const wallRef   = useRef({})
   const zoneRef   = useRef({})
@@ -158,6 +160,13 @@ export default function GreenhousePlanner({ zones = [], greenhouseId, greenhouse
     getAllPlants().then(d => setAllPlants(Array.isArray(d) ? d : [])).catch(() => {})
     getSubstrates().then(d => setSubstrates(Array.isArray(d) ? d : [])).catch(() => {})
   }, [])
+
+  const reloadPlans = useCallback(() => {
+    if (!greenhouseId) return
+    getPlansByGreenhouse(greenhouseId).then(d => setExistingPlans(Array.isArray(d) ? d : [])).catch(() => {})
+  }, [greenhouseId])
+
+  useEffect(() => { reloadPlans() }, [reloadPlans])
 
   useEffect(() => {
     if (!greenhouseId) return
@@ -330,9 +339,10 @@ export default function GreenhousePlanner({ zones = [], greenhouseId, greenhouse
     if (!z) return
     setActiveZoneId(zId)
     setZpName(z.name)
-    // Restore saved farmer_plant_id as fp: key
     setZpPlantId(z.farmer_plant_id ? `fp:${z.farmer_plant_id}` : '')
-    setZpSubstrateId(substrates[0]?.id || '')
+    // Restore substrate from the zone's most recent plan, or default to first substrate
+    const zonePlan = existingPlans.filter(p => p.zone_id === zId).sort((a, b) => new Date(b.planted_at) - new Date(a.planted_at))[0]
+    setZpSubstrateId(zonePlan?.substrate_id || substrates[0]?.id || '')
     setZpDate(new Date().toISOString().slice(0,10))
   }
 
@@ -372,11 +382,28 @@ export default function GreenhousePlanner({ zones = [], greenhouseId, greenhouse
         heating_coverage_pct: Math.min(100, heatAnalysis.pct),
       })
       addToast('План посадки створено ✓', 'success')
+      reloadPlans()
       setActiveZoneId(null)
     } catch (err) {
-      addToast(err?.response?.data?.detail || 'Помилка', 'error')
+      const d = err?.response?.data?.detail
+      const msg = typeof d === 'string' ? d : Array.isArray(d) ? d.map(x => x.msg).join('; ') : err?.message || 'Помилка'
+      addToast(msg, 'error')
     } finally { setCreatingPlan(false) }
   }
+
+  async function handleDeletePlan(planId) {
+    setDeletingPlan(true)
+    try {
+      await deletePlan(planId)
+      addToast('План видалено', 'success')
+      reloadPlans()
+    } catch (err) {
+      addToast(err?.response?.data?.detail || 'Помилка видалення', 'error')
+    } finally { setDeletingPlan(false) }
+  }
+
+  // Plans for the currently open zone
+  const zonePlans = activeZoneId ? existingPlans.filter(p => p.zone_id === activeZoneId) : []
 
   // Forecast — fp may be null for catalog plant (uses defaults for display)
   const fp           = resolveFp(zpPlantId)
@@ -418,10 +445,14 @@ export default function GreenhousePlanner({ zones = [], greenhouseId, greenhouse
 
   const revenue  = hasPlantSelected && yieldKg ? Math.round(parseFloat(yieldKg) * effSellPrice) : null
 
-  // Costs
-  const seedCost = plantsCount != null ? Math.round(plantsCount * effSeedPrice) : 0
-  const opCost   = adjGrowDays ? Math.round(zpAreaM2 * adjGrowDays * 0.8) : Math.round(zpAreaM2 * 30)
-  const costs    = hasPlantSelected && zpAreaM2 ? seedCost + opCost : null
+  // Costs — approximated for preview (exact breakdown comes from backend forecast)
+  const seedCost  = plantsCount != null ? Math.round(plantsCount * effSeedPrice) : 0
+  // Water: 0.8 L/m²/day at 0.05 UAH/L; Fertilizer: ~12 UAH/m² flat; Heating/misc: ~0.03 UAH/m²/day
+  const waterCost = adjGrowDays ? Math.round(zpAreaM2 * adjGrowDays * 0.04) : 0
+  const fertCost  = zpAreaM2 ? Math.round(zpAreaM2 * 12) : 0
+  const heatOpCost = adjGrowDays ? Math.round(zpAreaM2 * adjGrowDays * 0.05) : 0
+  const opCost    = waterCost + fertCost + heatOpCost
+  const costs     = hasPlantSelected && zpAreaM2 ? seedCost + opCost : null
   const profit   = revenue != null && costs != null ? revenue - costs : null
 
   // Yield penalty from equipment analysis
@@ -1023,7 +1054,7 @@ export default function GreenhousePlanner({ zones = [], greenhouseId, greenhouse
                       { icon: '💰', label: 'Дохід',       value: adjRevenue ? `~${adjRevenue.toLocaleString('uk-UA')} ₴` : '—' },
                       { icon: '💸', label: 'Витрати',
                         value: costs ? `~${costs.toLocaleString('uk-UA')} ₴` : '—',
-                        sub: costs ? `насіння ~${seedCost} ₴ + операц. ~${opCost} ₴` : null },
+                        sub: costs ? `насіння ~${seedCost} ₴ + вода ~${waterCost} ₴ + добрива ~${fertCost} ₴ + опал. ~${heatOpCost} ₴` : null },
                       { icon: '📈', label: 'Прибуток',
                         value: adjProfit != null ? `~${adjProfit.toLocaleString('uk-UA')} ₴` : '—',
                         accent: adjProfit != null && adjProfit > 0 },
@@ -1048,6 +1079,61 @@ export default function GreenhousePlanner({ zones = [], greenhouseId, greenhouse
                         <p style={{ color: '#ef4444' }}>⚠ Ризик втрат врожаю при низьких температурах (−10%)</p>
                       </div>
                     )}
+                  </div>
+                </div>
+              )}
+
+              {/* Existing plans for this zone */}
+              {zonePlans.length > 0 && (
+                <div className="rounded-xl overflow-hidden" style={{ border: '1px solid #1e3a2a' }}>
+                  <div className="px-3 py-2" style={{ background: '#0d2518' }}>
+                    <p className="text-xs font-semibold" style={{ color: '#40a070' }}>
+                      📋 Існуючі плани ({zonePlans.length})
+                    </p>
+                  </div>
+                  <div className="p-2 space-y-2">
+                    {zonePlans.map(plan => {
+                      const planFp = farmerPlants.find(f => String(f.id) === String(plan.farmer_plant_id))
+                      const planSubstrate = substrates.find(s => String(s.id) === String(plan.substrate_id))
+                      return (
+                        <div key={plan.id} className="rounded-lg p-2.5" style={{ background: '#0a1a12', border: '1px solid #1e3a2a' }}>
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-semibold truncate" style={{ color: '#e2e8f0' }}>
+                                {planFp?.plant?.name || '—'}
+                              </p>
+                              <p className="text-[10px] mt-0.5" style={{ color: '#4a5568' }}>
+                                📅 {plan.planted_at} → {plan.expected_harvest_at}
+                              </p>
+                              {planSubstrate && (
+                                <p className="text-[10px]" style={{ color: '#4a5568' }}>
+                                  🪨 {planSubstrate.name}
+                                </p>
+                              )}
+                              <span
+                                className="inline-block text-[9px] px-1.5 py-0.5 rounded-full mt-1 font-medium"
+                                style={{
+                                  background: plan.status === 'ready' ? '#052e1640' : '#451a0340',
+                                  color: plan.status === 'ready' ? '#22c55e' : '#f59e0b',
+                                  border: `1px solid ${plan.status === 'ready' ? '#166534' : '#78350f'}`,
+                                }}
+                              >
+                                {plan.status === 'ready' ? '✓ готово' : plan.status}
+                              </span>
+                            </div>
+                            <button
+                              onClick={() => handleDeletePlan(plan.id)}
+                              disabled={deletingPlan}
+                              className="flex-shrink-0 text-xs px-2 py-1 rounded-lg transition-all"
+                              style={{ background: '#450a0a40', color: '#ef4444', border: '1px solid #7f1d1d' }}
+                              title="Видалити план"
+                            >
+                              🗑
+                            </button>
+                          </div>
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
               )}

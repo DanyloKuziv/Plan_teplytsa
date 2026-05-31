@@ -11,6 +11,7 @@ from app.schemas.forecast import ForecastOut, WaterCostBreakdown, SeedCostBreakd
 
 _WATER_PRICE_PER_LITER = 0.05
 _NEWS_LOOKBACK_DAYS = 30
+_SEASON_DAYS = 210  # Oct–Apr heating season (7 months × 30 days)
 
 
 def _news_price_impact(db: Session, plant_name: str) -> float:
@@ -75,10 +76,10 @@ def calculate_forecast(db: Session, plan: PlantingPlan) -> ForecastOut:
     )
 
     heating = calculate_heating_cost(greenhouse)
-    monthly_heating_uah = heating["cost_uah"] / 7.0
     area_ratio = plan.area / greenhouse.total_area if greenhouse.total_area else 1.0
     grow_days = farmer_plant.plant.grow_days if farmer_plant.plant else 30
-    heating_cost_uah = monthly_heating_uah * area_ratio * (grow_days / 30.0)
+    # Heating cost proportional to zone area and crop cycle length vs. full season
+    heating_cost_uah = heating["cost_uah"] * area_ratio * (grow_days / _SEASON_DAYS)
 
     total_costs = water_cost_uah + seed_cost_uah + fertilizer_cost_uah + heating_cost_uah
     net_profit = revenue_uah - total_costs
@@ -103,7 +104,7 @@ def calculate_forecast(db: Session, plan: PlantingPlan) -> ForecastOut:
             cost_uah=round(fertilizer_cost_uah, 2),
         ),
         heating_cost=HeatingCostBreakdown(
-            season_kwh=round(heating["season_kwh"] * area_ratio * (grow_days / (7 * 30)), 1),
+            season_kwh=round(heating["season_kwh"] * area_ratio * (grow_days / _SEASON_DAYS), 1),
             cost_uah=round(heating_cost_uah, 2),
         ),
         total_costs_uah=round(total_costs, 2),
