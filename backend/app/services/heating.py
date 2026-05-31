@@ -1,38 +1,32 @@
 from app.models.greenhouse import Greenhouse, HeatingType, InsulationType
 
-# Heating hours per season (October–April ≈ 210 days × 12h)
-_SEASON_HOURS = 210 * 12
+# Heating hours per season (October–April ≈ 210 days × 12h × 50% duty cycle)
+_SEASON_HOURS = 210 * 12 * 0.5
 
-# Insulation loss factor — multiplier on required power
-_INSULATION_FACTOR = {
-    InsulationType.none: 1.40,
-    InsulationType.basic: 1.15,
-    InsulationType.good: 1.00,
+# Heat loss W per m² — how much power is actually needed to maintain +18°C inside
+_HEAT_LOSS_W_M2 = {
+    InsulationType.none: 90,
+    InsulationType.basic: 65,
+    InsulationType.good: 45,
 }
 
 # Energy units consumed per kWh of thermal output (fuel_unit / kWh_thermal)
-# gas: 1 m³ ≈ 10 kWh, so 0.10 m³/kWh
-# wood: 1 kg ≈ 4 kWh, so 0.25 kg/kWh
-# electric: 1 kWh_el = 1 kWh_thermal (COP=1 assumed for resistance)
-# heat_pump: COP≈3, so 0.33 kWh_el per kWh_thermal
 _FUEL_FACTOR = {
-    HeatingType.gas: 0.10,
-    HeatingType.wood: 0.25,
-    HeatingType.electric: 1.00,
-    HeatingType.heat_pump: 0.33,
+    HeatingType.gas: 0.10,        # 1 m³ ≈ 10 kWh
+    HeatingType.wood: 0.25,       # 1 kg ≈ 4 kWh
+    HeatingType.electric: 1.00,   # resistance heater
+    HeatingType.heat_pump: 0.33,  # COP ≈ 3
 }
 
 
 def calculate_heating_cost(greenhouse: Greenhouse) -> dict:
-    """Return seasonal heating cost breakdown.
+    """Return seasonal heating cost based on greenhouse heat loss, not installed capacity."""
+    heat_loss_w_m2 = _HEAT_LOSS_W_M2[greenhouse.insulation_type]
+    required_kw = greenhouse.total_area * heat_loss_w_m2 / 1000
+    # Use required power, capped at installed capacity (can't use more than installed)
+    effective_kw = min(greenhouse.heating_power_kw, required_kw)
 
-    Returns:
-        season_kwh: thermal energy needed
-        fuel_units: physical fuel consumed
-        cost_uah: total cost
-    """
-    insulation_factor = _INSULATION_FACTOR[greenhouse.insulation_type]
-    season_kwh = greenhouse.heating_power_kw * _SEASON_HOURS * insulation_factor
+    season_kwh = effective_kw * _SEASON_HOURS
     fuel_units = season_kwh * _FUEL_FACTOR[greenhouse.heating_type]
     cost_uah = fuel_units * greenhouse.fuel_cost_per_unit
 
