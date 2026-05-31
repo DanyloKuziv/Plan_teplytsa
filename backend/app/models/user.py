@@ -21,6 +21,7 @@ class User(Base):
 
     reset_code: Mapped[str | None] = mapped_column(String(6), nullable=True)
     reset_expires: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    subscription_expires: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
     greenhouses: Mapped[list["Greenhouse"]] = relationship("Greenhouse", back_populates="user", cascade="all, delete-orphan")
     farmer_plants: Mapped[list["FarmerPlant"]] = relationship("FarmerPlant", back_populates="user", cascade="all, delete-orphan")

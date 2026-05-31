@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import func
 from sqlalchemy.orm import Session, joinedload, subqueryload
@@ -52,19 +53,48 @@ def admin_stats(db: Session = Depends(get_db), _: User = Depends(_require_admin)
 # ── Users ─────────────────────────────────────────────────────────────────────
 @router.get("/users")
 def admin_list_users(db: Session = Depends(get_db), _: User = Depends(_require_admin)):
-    users = db.query(User).options(subqueryload(User.greenhouses)).order_by(User.created_at.desc()).all()
-    return [
-        {
-            "id":         str(u.id),
-            "email":      u.email,
-            "full_name":  u.full_name,
-            "is_verified": u.is_verified,
-            "is_admin":   u.is_admin,
-            "created_at": u.created_at.isoformat(),
-            "greenhouse_count": len(u.greenhouses),
-        }
-        for u in users
-    ]
+    users = (
+        db.query(User)
+        .options(subqueryload(User.greenhouses).subqueryload(Greenhouse.planting_plans))
+        .order_by(User.created_at.desc())
+        .all()
+    )
+    result = []
+    for u in users:
+        plans_count = sum(len(g.planting_plans) for g in u.greenhouses)
+        revenue = (
+            db.query(func.sum(HarvestRecord.revenue))
+            .join(Greenhouse, HarvestRecord.greenhouse_id == Greenhouse.id)
+            .filter(Greenhouse.user_id == u.id)
+            .scalar() or 0.0
+        )
+        result.append({
+            "id":                   str(u.id),
+            "email":                u.email,
+            "full_name":            u.full_name,
+            "is_verified":          u.is_verified,
+            "is_admin":             u.is_admin,
+            "created_at":           u.created_at.isoformat(),
+            "greenhouse_count":     len(u.greenhouses),
+            "plans_count":          plans_count,
+            "revenue_uah":          round(revenue, 2),
+            "subscription_expires": u.subscription_expires.isoformat() if u.subscription_expires else None,
+        })
+    return result
+
+
+class SubscriptionPayload(BaseModel):
+    subscription_expires: Optional[str] = None
+
+
+@router.patch("/users/{user_id}/subscription")
+def set_subscription(user_id: uuid.UUID, payload: SubscriptionPayload, db: Session = Depends(get_db), _: User = Depends(_require_admin)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    user.subscription_expires = datetime.fromisoformat(payload.subscription_expires) if payload.subscription_expires else None
+    db.commit()
+    return {"id": str(user.id), "subscription_expires": user.subscription_expires.isoformat() if user.subscription_expires else None}
 
 
 @router.patch("/users/{user_id}/toggle-admin")
@@ -77,6 +107,17 @@ def toggle_admin(user_id: uuid.UUID, db: Session = Depends(get_db), _: User = De
     user.is_admin = not user.is_admin
     db.commit()
     return {"id": str(user.id), "is_admin": user.is_admin}
+
+
+@router.delete("/users/{user_id}", status_code=204)
+def admin_delete_user(user_id: uuid.UUID, db: Session = Depends(get_db), _: User = Depends(_require_admin)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if user.email.lower() == SUPERADMIN_EMAIL:
+        raise HTTPException(status_code=400, detail="Cannot delete superadmin")
+    db.delete(user)
+    db.commit()
 
 
 # ── Greenhouses ───────────────────────────────────────────────────────────────

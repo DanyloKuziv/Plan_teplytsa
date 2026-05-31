@@ -51,7 +51,8 @@ function AppRoutes() {
       <Route path="/farmer-plants" element={<ProtectedRoute><FarmerPlants /></ProtectedRoute>} />
       <Route path="/market-prices" element={<ProtectedRoute><MarketPrices /></ProtectedRoute>} />
       <Route path="/alerts/:greenhouse_id" element={<ProtectedRoute><AlertsPage /></ProtectedRoute>} />
-      <Route path="/admin" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
+      <Route path="/admin"       element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
+      <Route path="/admin_panel" element={<AdminPanel />} />
 
       {/* 404 fallback */}
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
