@@ -16,8 +16,9 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     conn = op.get_bind()
+    dialect = conn.dialect.name
 
-    # Null out any zone.farmer_plant_id values that no longer exist in farmer_plants
+    # Null out orphan zone.farmer_plant_id references
     conn.execute(sa.text("""
         UPDATE zones
         SET farmer_plant_id = NULL
@@ -25,10 +26,17 @@ def upgrade() -> None:
           AND farmer_plant_id NOT IN (SELECT id FROM farmer_plants)
     """))
 
-    # Add the FK constraint now that orphan rows are cleaned up
-    # SQLite doesn't support ADD CONSTRAINT — check dialect
-    dialect = conn.dialect.name
-    if dialect != "sqlite":
+    if dialect == "sqlite":
+        return
+
+    # Check if the FK constraint already exists before creating it
+    exists = conn.execute(sa.text("""
+        SELECT 1 FROM information_schema.table_constraints
+        WHERE constraint_name = 'fk_zones_farmer_plant_id'
+          AND table_name = 'zones'
+    """)).fetchone()
+
+    if not exists:
         op.create_foreign_key(
             "fk_zones_farmer_plant_id",
             "zones", "farmer_plants",
@@ -39,5 +47,9 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     dialect = op.get_bind().dialect.name
-    if dialect != "sqlite":
+    if dialect == "sqlite":
+        return
+    try:
         op.drop_constraint("fk_zones_farmer_plant_id", "zones", type_="foreignkey")
+    except Exception:
+        pass
