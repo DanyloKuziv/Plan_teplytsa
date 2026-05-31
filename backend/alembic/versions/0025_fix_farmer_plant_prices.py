@@ -46,10 +46,13 @@ UPDATES = [
 def upgrade() -> None:
     conn = op.get_bind()
     for pattern, yld, price in UPDATES:
+        # Only update records that still have the old default price (30.0),
+        # so user-customized prices are not overwritten.
         conn.execute(sa.text("""
             UPDATE farmer_plants
             SET yield_per_m2 = :y, sell_price = :p
-            WHERE plant_id IN (
+            WHERE sell_price = 30.0
+              AND plant_id IN (
                 SELECT id FROM plants WHERE lower(name) LIKE lower(:n)
             )
         """), {"y": yld, "p": price, "n": pattern})
