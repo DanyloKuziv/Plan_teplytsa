@@ -44,10 +44,10 @@ def upgrade() -> None:
         sa.Column("user_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("users.id", ondelete="CASCADE"), nullable=False),
         sa.Column("name", sa.String(255), nullable=False),
         sa.Column("total_area", sa.Float, nullable=False),
-        sa.Column("heating_type", sa.Enum("gas", "wood", "electric", "heat_pump", name="heatingtype"), nullable=False),
+        sa.Column("heating_type", sa.Enum("gas", "wood", "electric", "heat_pump", name="heatingtype", create_type=False), nullable=False),
         sa.Column("heating_power_kw", sa.Float, nullable=False),
         sa.Column("fuel_cost_per_unit", sa.Float, nullable=False),
-        sa.Column("insulation_type", sa.Enum("none", "basic", "good", name="insulationtype"), nullable=False),
+        sa.Column("insulation_type", sa.Enum("none", "basic", "good", name="insulationtype", create_type=False), nullable=False),
         sa.Column("created_at", sa.DateTime, nullable=False, server_default=sa.func.now()),
     )
     op.create_index("ix_greenhouses_user_id", "greenhouses", ["user_id"])
@@ -101,7 +101,7 @@ def upgrade() -> None:
         sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),
         sa.Column("name", sa.String(255), nullable=False),
         sa.Column("npk_formula", sa.String(50), nullable=False),
-        sa.Column("phase", sa.Enum("seedling", "growth", "flowering", "ripening", name="growthphase"), nullable=False),
+        sa.Column("phase", sa.Enum("seedling", "growth", "flowering", "ripening", name="growthphase", create_type=False), nullable=False),
         sa.Column("dose_per_m2", sa.Float, nullable=False),
         sa.Column("price_per_kg", sa.Float, nullable=False),
     )
@@ -125,7 +125,7 @@ def upgrade() -> None:
         sa.Column("plan_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("planting_plans.id", ondelete="CASCADE"), nullable=False),
         sa.Column("scheduled_date", sa.Date, nullable=False),
         sa.Column("volume_liters", sa.Float, nullable=False),
-        sa.Column("growth_phase", sa.Enum("seedling", "growth", "flowering", "ripening", name="growthphase"), nullable=False),
+        sa.Column("growth_phase", sa.Enum("seedling", "growth", "flowering", "ripening", name="growthphase", create_type=False), nullable=False),
     )
     op.create_index("ix_irrigation_schedules_plan_id", "irrigation_schedules", ["plan_id"])
 
@@ -136,7 +136,7 @@ def upgrade() -> None:
         sa.Column("fertilizer_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("fertilizers.id"), nullable=False),
         sa.Column("scheduled_date", sa.Date, nullable=False),
         sa.Column("dose_grams", sa.Float, nullable=False),
-        sa.Column("growth_phase", sa.Enum("seedling", "growth", "flowering", "ripening", name="growthphase"), nullable=False),
+        sa.Column("growth_phase", sa.Enum("seedling", "growth", "flowering", "ripening", name="growthphase", create_type=False), nullable=False),
     )
     op.create_index("ix_fertilizer_schedules_plan_id", "fertilizer_schedules", ["plan_id"])
 

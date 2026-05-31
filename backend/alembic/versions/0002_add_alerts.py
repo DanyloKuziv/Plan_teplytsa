@@ -33,7 +33,7 @@ def upgrade() -> None:
         ),
         sa.Column(
             "type",
-            sa.Enum("high_temperature", "high_co2", "low_humidity", "system", name="alerttype"),
+            sa.Enum("high_temperature", "high_co2", "low_humidity", "system", name="alerttype", create_type=False),
             nullable=False,
         ),
         sa.Column("message", sa.Text, nullable=False),
