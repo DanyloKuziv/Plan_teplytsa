@@ -36,6 +36,17 @@ def upgrade() -> None:
           AND table_name = 'zones'
     """)).fetchone()
 
+    # Ensure the column is UUID type before adding FK
+    col_type = conn.execute(sa.text("""
+        SELECT data_type FROM information_schema.columns
+        WHERE table_name = 'zones' AND column_name = 'farmer_plant_id'
+    """)).scalar()
+
+    if col_type and col_type.lower() != 'uuid':
+        conn.execute(sa.text(
+            "ALTER TABLE zones ALTER COLUMN farmer_plant_id TYPE uuid USING farmer_plant_id::uuid"
+        ))
+
     if not exists:
         op.create_foreign_key(
             "fk_zones_farmer_plant_id",
