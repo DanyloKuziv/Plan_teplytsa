@@ -7,9 +7,9 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 const STORAGE_KEY = 'admin_jwt'
 
 // ── Admin auth ────────────────────────────────────────────────────────────────
-function getAdminToken() { return sessionStorage.getItem(STORAGE_KEY) }
-function setAdminToken(t) { sessionStorage.setItem(STORAGE_KEY, t) }
-function clearAdminToken() { sessionStorage.removeItem(STORAGE_KEY) }
+function getAdminToken() { return localStorage.getItem(STORAGE_KEY) }
+function setAdminToken(t) { localStorage.setItem(STORAGE_KEY, t) }
+function clearAdminToken() { localStorage.removeItem(STORAGE_KEY) }
 
 // ── Login page ────────────────────────────────────────────────────────────────
 function AdminLogin({ onLogin }) {

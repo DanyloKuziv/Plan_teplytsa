@@ -35,10 +35,34 @@ def admin_token(payload: AdminTokenPayload):
     return {"access_token": token, "token_type": "bearer"}
 
 
-def _require_admin(current_user: User = Depends(get_current_user)) -> User:
-    if not current_user.is_admin or current_user.email.lower() != SUPERADMIN_EMAIL:
-        raise HTTPException(status_code=403, detail="Admin access required")
-    return current_user
+from fastapi.security import OAuth2PasswordBearer as _OAuth2
+from jose import jwt as _jwt, JWTError as _JWTError
+
+_oauth2 = _OAuth2(tokenUrl="/auth/login", auto_error=False)
+
+def _require_admin(token: str = Depends(_oauth2), db: Session = Depends(get_db)) -> User:
+    exc = HTTPException(status_code=403, detail="Admin access required")
+    if not token:
+        raise exc
+    try:
+        from app.core.config import settings as _s
+        payload = _jwt.decode(token, _s.SECRET_KEY, algorithms=[_s.ALGORITHM])
+    except _JWTError:
+        raise exc
+    # Token issued by /admin/token has sub="admin" and is_admin=True
+    if payload.get("sub") == "admin" and payload.get("is_admin"):
+        return None  # no DB user needed
+    # Regular user token — verify in DB
+    if not payload.get("is_admin"):
+        raise exc
+    import uuid as _uuid
+    try:
+        user = db.query(User).filter(User.id == _uuid.UUID(payload["sub"])).first()
+    except Exception:
+        raise exc
+    if not user or user.email.lower() != SUPERADMIN_EMAIL:
+        raise exc
+    return user
 
 
 # ── Stats ─────────────────────────────────────────────────────────────────────

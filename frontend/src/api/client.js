@@ -18,7 +18,7 @@ client.interceptors.response.use(
   (response) => response,
   (error) => {
     const url = error.config?.url || ''
-    if (error.response?.status === 401 && !url.startsWith('/auth/')) {
+    if (error.response?.status === 401 && !url.startsWith('/auth/') && !url.startsWith('/admin/')) {
       localStorage.removeItem('greenhouse_token')
       window.location.href = '/login'
     }
