@@ -303,8 +303,17 @@ export default function GreenhousePlanner({ zones = [], greenhouseId, greenhouse
   // Ensure a real farmerPlant exists for the chosen key; returns farmerPlant id string
   async function ensureFarmerPlant(key) {
     if (!key) return null
-    if (key.startsWith('fp:')) return key.slice(3)
-    const plantId = key.slice(3)
+    if (key.startsWith('fp:')) {
+      const fpId = key.slice(3)
+      const exists = farmerPlants.find(f => String(f.id) === fpId)
+      if (exists) return fpId
+      // stale reference — fall through to create fresh
+    }
+    const plantId = key.startsWith('fp:') ? null : key.slice(3)
+    if (!plantId) return null
+    // reuse existing farmer_plant for this plant if one already exists
+    const existing = farmerPlants.find(f => String(f.plant_id) === plantId)
+    if (existing) return String(existing.id)
     const plant = allPlants.find(p => String(p.id) === plantId)
     const defaults = {
       ...FP_DEFAULTS,
@@ -336,7 +345,11 @@ export default function GreenhousePlanner({ zones = [], greenhouseId, greenhouse
       if (fpId && zpPlantId.startsWith('pl:')) setZpPlantId(`fp:${fpId}`)
       addToast('Зону оновлено', 'success')
       if (onZonesChange) onZonesChange()
-    } catch { addToast('Помилка', 'error') }
+    } catch (err) {
+      const d = err?.response?.data?.detail
+      const msg = typeof d === 'string' ? d : Array.isArray(d) ? d.map(x => x.msg).join('; ') : err?.message || 'Помилка збереження зони'
+      addToast(msg, 'error')
+    }
   }
 
   async function handleCreatePlan() {
