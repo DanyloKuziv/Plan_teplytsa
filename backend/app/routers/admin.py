@@ -15,6 +15,7 @@ from app.models.plant import Plant
 from app.models.news_feed import NewsFeed
 from app.models.sensor_log import SensorLog
 from app.models.harvest_record import HarvestRecord
+from app.models.planting_plan import PlantingPlan as _PlantingPlan
 from app.schemas.news_feed import NewsFeedCreate, NewsFeedUpdate, NewsFeedOut
 
 router = APIRouter()
@@ -101,7 +102,8 @@ def admin_list_users(db: Session = Depends(get_db), _: User = Depends(_require_a
         plans_count = sum(len(g.planting_plans) for g in u.greenhouses)
         revenue = (
             db.query(func.sum(HarvestRecord.revenue))
-            .join(Greenhouse, HarvestRecord.greenhouse_id == Greenhouse.id)
+            .join(_PlantingPlan, HarvestRecord.plan_id == _PlantingPlan.id)
+            .join(Greenhouse, _PlantingPlan.greenhouse_id == Greenhouse.id)
             .filter(Greenhouse.user_id == u.id)
             .scalar() or 0.0
         )
