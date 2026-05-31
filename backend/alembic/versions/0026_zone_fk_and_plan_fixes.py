@@ -23,7 +23,7 @@ def upgrade() -> None:
         UPDATE zones
         SET farmer_plant_id = NULL
         WHERE farmer_plant_id IS NOT NULL
-          AND farmer_plant_id NOT IN (SELECT id FROM farmer_plants)
+          AND farmer_plant_id::text NOT IN (SELECT id::text FROM farmer_plants)
     """))
 
     if dialect == "sqlite":
