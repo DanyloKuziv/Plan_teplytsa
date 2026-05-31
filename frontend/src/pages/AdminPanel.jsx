@@ -13,7 +13,6 @@ function clearAdminToken() { sessionStorage.removeItem(STORAGE_KEY) }
 
 // ── Login page ────────────────────────────────────────────────────────────────
 function AdminLogin({ onLogin }) {
-  const [email, setEmail]       = useState('')
   const [password, setPassword] = useState('')
   const [showPwd, setShowPwd]   = useState(false)
   const [error, setError]       = useState('')
@@ -23,16 +22,11 @@ function AdminLogin({ onLogin }) {
     e.preventDefault()
     setLoading(true); setError('')
     try {
-      const form = new URLSearchParams()
-      form.append('username', email)
-      form.append('password', password)
-      const { data } = await axios.post(`${API_URL}/auth/login`, form)
-      const payload = JSON.parse(atob(data.access_token.split('.')[1]))
-      if (!payload.is_admin) { setError('Немає прав адміністратора'); return }
+      const { data } = await axios.post(`${API_URL}/admin/token`, { password })
       setAdminToken(data.access_token)
       onLogin(data.access_token)
     } catch (err) {
-      setError(err?.response?.data?.detail || 'Невірний email або пароль')
+      setError(err?.response?.data?.detail || 'Невірний пароль')
     } finally {
       setLoading(false)
     }
@@ -50,27 +44,21 @@ function AdminLogin({ onLogin }) {
         </div>
 
         <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
-          <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-accent/10 border border-accent/20 mb-6 mx-auto">
+          <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-[#00d4aa]/10 border border-[#00d4aa]/20 mb-6 mx-auto">
             <svg width="22" height="22" fill="none" stroke="#00d4aa" strokeWidth="2" viewBox="0 0 24 24">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
             </svg>
           </div>
           <h1 className="text-2xl font-bold text-white text-center mb-1">Вхід в адмін-панель</h1>
-          <p className="text-white/40 text-sm text-center mb-7">Тільки для адміністраторів</p>
+          <p className="text-white/40 text-sm text-center mb-7">Введіть пароль адміністратора</p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-medium text-white/50 mb-1.5">Email</label>
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)}
-                placeholder="admin@email.com" autoComplete="email"
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/10" />
-            </div>
             <div>
               <label className="block text-xs font-medium text-white/50 mb-1.5">Пароль</label>
               <div className="relative">
                 <input type={showPwd ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)}
-                  placeholder="••••••••" autoComplete="current-password"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/10 pr-10" />
+                  placeholder="••••••••" autoFocus
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 outline-none focus:border-[#00d4aa]/50 focus:ring-1 focus:ring-[#00d4aa]/10 pr-10" />
                 <button type="button" onClick={() => setShowPwd(v => !v)}
                   className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60">
                   <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -83,7 +71,7 @@ function AdminLogin({ onLogin }) {
             </div>
             {error && <p className="text-xs text-red-400 text-center">{error}</p>}
             <button type="submit" disabled={loading}
-              className="w-full py-3 rounded-xl bg-accent text-[#080c14] font-bold text-sm tracking-wide hover:bg-[#00e8bc] transition-colors disabled:opacity-50 shadow-[0_0_20px_rgba(0,212,170,0.3)]">
+              className="w-full py-3 rounded-xl bg-[#00d4aa] text-[#080c14] font-bold text-sm tracking-wide hover:bg-[#00e8bc] transition-colors disabled:opacity-50 shadow-[0_0_20px_rgba(0,212,170,0.3)]">
               {loading ? 'Вхід…' : 'Увійти →'}
             </button>
           </form>

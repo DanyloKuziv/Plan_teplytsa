@@ -21,6 +21,8 @@ class Settings(BaseSettings):
 
     CORS_ORIGINS: str = "http://localhost:3000"
 
+    ADMIN_SECRET: str = "admin2026"
+
     # Mail (Resend API — preferred)
     RESEND_API_KEY: str = ""
     MAIL_FROM: str = "onboarding@resend.dev"
