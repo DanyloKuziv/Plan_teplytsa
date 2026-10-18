@@ -305,7 +305,7 @@ export default function ForgotPassword() {
       <div className="relative z-10 flex flex-col justify-center w-full lg:w-[46%] px-8 sm:px-14 py-12">
         <div className="flex items-center gap-2.5 mb-10">
           {LOGO}
-          <span className="font-bold text-lg text-white tracking-tight">ТеплицяПлан</span>
+          <span className="font-bold text-lg text-white tracking-tight">GreenFlow</span>
         </div>
 
         {step === 'email'

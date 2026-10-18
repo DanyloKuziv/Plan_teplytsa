@@ -106,7 +106,7 @@ export default function Navbar() {
               <path d="M28 41 C23 39 21 35 23 32" stroke="#00d4aa" strokeWidth="2" strokeLinecap="round" fill="none"/>
               <path d="M28 41 C33 39 35 35 33 32" stroke="#00d4aa" strokeWidth="2" strokeLinecap="round" fill="none"/>
             </svg>
-            <span className="hidden sm:inline text-txt">ТеплицяПлан</span>
+            <span className="hidden sm:inline text-txt">GreenFlow</span>
           </Link>
 
           {/* Desktop nav */}

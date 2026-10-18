@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routers import (
     auth, greenhouses, zones, farmer_plants, plants, planting_plans,
     market_prices, sensor_logs, news, alerts, websocket, floor_plans,
-    substrates, financial, admin,
+    substrates, financial, admin, leads,
 )
 
 logger = logging.getLogger(__name__)
@@ -112,6 +112,7 @@ app.include_router(floor_plans.router,    prefix="/greenhouses",    tags=["Пл�
 app.include_router(substrates.router,     prefix="/substrates",     tags=["Субстрати"])
 app.include_router(financial.router,      prefix="/users/me",       tags=["Фінанси"])
 app.include_router(admin.router,          prefix="/admin",          tags=["Адмін"])
+app.include_router(leads.router,          prefix="/leads",          tags=["Заявки"])
 
 
 @app.get("/", tags=["Health"])

@@ -430,7 +430,7 @@ export default function Register() {
         {/* Logo */}
         <div className="flex items-center gap-2.5 mb-10">
           {LOGO}
-          <span className="font-bold text-lg text-white tracking-tight">ТеплицяПлан</span>
+          <span className="font-bold text-lg text-white tracking-tight">GreenFlow</span>
         </div>
 
         {step === 'form'

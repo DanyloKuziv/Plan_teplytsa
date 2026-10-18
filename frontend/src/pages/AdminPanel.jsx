@@ -40,7 +40,7 @@ function AdminLogin({ onLogin }) {
             <rect width="56" height="56" rx="13" fill="#0d1428"/>
             <path d="M28 6 L50 20 L50 50 L6 50 L6 20 Z" stroke="#00d4aa" strokeWidth="2.4" fill="none" strokeLinejoin="round"/>
           </svg>
-          <span className="font-bold text-lg text-white tracking-tight">ТеплицяПлан · Адмін</span>
+          <span className="font-bold text-lg text-white tracking-tight">GreenFlow · Адмін</span>
         </div>
 
         <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
@@ -427,7 +427,7 @@ export default function AdminPanel() {
             <path d="M28 6 L50 20 L50 50 L6 50 L6 20 Z" stroke="#00d4aa" strokeWidth="2.4" fill="none" strokeLinejoin="round"/>
           </svg>
           <div>
-            <span className="font-bold text-base text-white">ТеплицяПлан</span>
+            <span className="font-bold text-base text-white">GreenFlow</span>
             <span className="text-white/40 text-sm ml-2">· Адмін-панель</span>
           </div>
         </div>

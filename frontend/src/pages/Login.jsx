@@ -67,7 +67,7 @@ export default function Login() {
             <path d="M28 41 C23 39 21 35 23 32" stroke="#00d4aa" strokeWidth="2" strokeLinecap="round" fill="none"/>
             <path d="M28 41 C33 39 35 35 33 32" stroke="#00d4aa" strokeWidth="2" strokeLinecap="round" fill="none"/>
           </svg>
-          <span className="font-bold text-lg text-white tracking-tight">ТеплицяПлан</span>
+          <span className="font-bold text-lg text-white tracking-tight">GreenFlow</span>
         </div>
 
         <h1 className="text-3xl font-bold text-white mb-1">Вхід до акаунту</h1>

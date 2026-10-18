@@ -29,6 +29,9 @@ class Settings(BaseSettings):
     MAIL_FROM_NAME: str = "TeplytsiaPlan"
     MAIL_ENABLED: bool = False
 
+    # Куди слати заявки на пілот з лендингу (порожньо — тільки лог)
+    LEADS_EMAIL: str = ""
+
     # Mail (SMTP fallback)
     MAIL_USERNAME: str = ""
     MAIL_PASSWORD: str = ""

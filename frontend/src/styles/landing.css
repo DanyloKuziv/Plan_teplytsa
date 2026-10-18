@@ -194,3 +194,7 @@
 .landing-root ::-webkit-scrollbar-track { background: #0a0e1a; }
 .landing-root ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 3px; }
 .landing-root ::-webkit-scrollbar-thumb:hover { background: #00d4aa44; }
+/* FAQ accordion */
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item[open] { border-color: rgba(0,212,170,0.3); }
+.faq-item[open] .faq-icon { transform: rotate(45deg); }
